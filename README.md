@@ -42,9 +42,6 @@ Note: Try opening the SC2 game client before installing. If the game crashes bef
 $ git clone --recursive https://github.com/solinas/BasicSc2Bot.git
 $ cd BasicSc2Bot
 
-:: In an editor, open ./sc2client-api/contrib/civetweb/src/civetweb.c
-:: comment out line 17867: #pragma GCC diagnostic ignored "-Werror"
-
 :: Create build directory.
 $ mkdir build
 $ cd build
@@ -56,3 +53,16 @@ $ cmake ../
 :: Build
 $ make
 ```
+
+# Playing against the built-in AI
+
+In addition to competing against other bots using the [Sc2LadderServer](https://github.com/solinas/Sc2LadderServer), this bot can play against the built-in
+AI by specifying command line argurments.
+
+For example,
+
+```
+/BasicSc2Bot.exe -c -a zerg -d hard -m CactusValleyLE.SC2Map
+```
+
+will result in the bot playing against the zerg built-in AI on hard difficulty on the map CactusValleyLE.
