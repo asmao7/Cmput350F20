@@ -22,6 +22,10 @@ private:
 	bool TryBuildSupplyDepot();
 	const Unit* FindNearestMineralPatch(const Point2D& start);
 	bool TryBuildBarracks();
+	bool TryBuildRefinery();
+	bool TryBuildAcademy();
+	bool TryBuildOrbitalCommand();
+	bool TryBuildFactory();
 };
 
 #endif

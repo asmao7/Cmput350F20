@@ -6,8 +6,10 @@ void OrionBot::OnGameStart() {
 
 void OrionBot::OnStep() { 
     TryBuildSupplyDepot();
-
+    TryBuildRefinery();
     TryBuildBarracks();
+    /*TryBuildOrbitalCommand();*/
+    TryBuildFactory();
 }
 void OrionBot::OnUnitIdle(const Unit* unit){
     switch (unit->unit_type.ToType()) {
@@ -30,6 +32,10 @@ void OrionBot::OnUnitIdle(const Unit* unit){
         case UNIT_TYPEID::TERRAN_MARINE: {
             const GameInfo& game_info = Observation()->GetGameInfo();
             Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
+            break;
+        }
+        case UNIT_TYPEID::TERRAN_ORBITALCOMMAND: {
+            Actions()->UnitCommand(unit, ABILITY_ID::MORPH_ORBITALCOMMAND);
             break;
         }
         default: {
@@ -81,6 +87,16 @@ bool OrionBot::TryBuildSupplyDepot() {
     return TryBuildStructure(ABILITY_ID::BUILD_SUPPLYDEPOT);
 }
 
+bool OrionBot::TryBuildRefinery() {
+    const ObservationInterface* observation = Observation();
+
+    //// If we are not supply capped, don't build a build refinery.
+    //if (observation->GetFoodUsed() <= observation->GetFoodCap() - 2)
+    //    return false;
+
+    return TryBuildStructure(ABILITY_ID::BUILD_REFINERY);
+}
+
 const Unit* OrionBot::FindNearestMineralPatch(const Point2D& start) {
     Units units = Observation()->GetUnits(Unit::Alliance::Neutral);
     float distance = std::numeric_limits<float>::max();
@@ -108,5 +124,26 @@ bool OrionBot::TryBuildBarracks() {
         return false;
     }
 
+    if (CountUnitType(UNIT_TYPEID::TERRAN_REFINERY) < 1) {
+        return false;
+    }
+
     return TryBuildStructure(ABILITY_ID::BUILD_BARRACKS);
+}
+
+bool OrionBot::TryBuildOrbitalCommand() {
+    const ObservationInterface* observation = Observation();
+    if (CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) > 1) {
+        return false;
+    }
+    //Fix
+    return TryBuildStructure(ABILITY_ID::BUILD_COMMANDCENTER);
+}
+
+bool OrionBot::TryBuildFactory() {
+    const ObservationInterface* observation = Observation();
+    if (CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) > 2) {
+        return false;
+    }
+    return TryBuildStructure(ABILITY_ID::BUILD_FACTORY);
 }
