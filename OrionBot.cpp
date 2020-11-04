@@ -8,6 +8,8 @@ void OrionBot::OnStep() {
     TryBuildSupplyDepot();
 
     TryBuildBarracks();
+
+    TryAttacking();
 }
 void OrionBot::OnUnitIdle(const Unit* unit){
     switch (unit->unit_type.ToType()) {
@@ -109,4 +111,27 @@ bool OrionBot::TryBuildBarracks() {
     }
 
     return TryBuildStructure(ABILITY_ID::BUILD_BARRACKS);
+}
+
+/*
+* check if enemies are within 
+* attack range if yes, then attack
+*/
+void OrionBot::TryAttacking() {
+    const ObservationInterface* observation = Observation();
+
+    Units enemyUnits = observation->GetUnits(Unit::Alliance::Enemy);
+    Units selfMarrineUnits = observation->GetUnits(Unit::Alliance::Self, IsUnit(UNIT_TYPEID::TERRAN_MARINE));
+
+    int ATTACK_RADIUS = 100;
+    const Point2D& start = observation->GetStartLocation();
+    for (const auto& u : enemyUnits) {
+        float d = DistanceSquared2D(u->pos, start);
+        if (d <= ATTACK_RADIUS) {
+            std::cout << "TRYING TO ATTACK NOW!" << std::endl;
+            const GameInfo& game_info = Observation()->GetGameInfo();
+            Actions()->UnitCommand(selfMarrineUnits, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
+        }
+    }
+
 }
