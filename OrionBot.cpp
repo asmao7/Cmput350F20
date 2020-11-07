@@ -13,6 +13,7 @@ void OrionBot::OnStep() {
     /*TryScouting();*/
     TryAttacking();
 }
+
 void OrionBot::OnUnitIdle(const Unit* unit){
     switch (unit->unit_type.ToType()) {
         case UNIT_TYPEID::TERRAN_COMMANDCENTER: {
@@ -56,6 +57,7 @@ void OrionBot::OnUnitIdle(const Unit* unit){
 size_t OrionBot::CountUnitType(UNIT_TYPEID unit_type) {
     return Observation()->GetUnits(Unit::Alliance::Self, IsUnit(unit_type)).size();
 }
+
 bool OrionBot::TryBuildStructure(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type = UNIT_TYPEID::TERRAN_SCV) {
     const ObservationInterface* observation = Observation();
 
@@ -96,11 +98,14 @@ bool OrionBot::TryBuildSupplyDepot() {
     return TryBuildStructure(ABILITY_ID::BUILD_SUPPLYDEPOT);
 }
 
+//Build a refinery.
+//Made by: Joe
 bool OrionBot::TryBuildRefinery() {
     const ObservationInterface* observation = Observation();
 
     return TryBuildStructure(ABILITY_ID::BUILD_REFINERY);
 }
+
 //trybuildgas
 const Unit* OrionBot::FindNearestMineralPatch(const Point2D& start) {
     Units units = Observation()->GetUnits(Unit::Alliance::Neutral);
@@ -117,6 +122,9 @@ const Unit* OrionBot::FindNearestMineralPatch(const Point2D& start) {
     }
     return target;
 }
+
+//Check if unit is a vespene geyser.
+//Made by: Joe
 struct IsVespeneGeyser {
     bool operator()(const Unit& unit) {
         switch (unit.unit_type.ToType()) {
@@ -125,6 +133,10 @@ struct IsVespeneGeyser {
         }
     }
 };
+
+//Find nearest vespene geyser to the scv.
+//Takes in a point.
+//Made by: Joe
 const Unit* OrionBot::FindNearestVespeneGeyser(const Point2D& start) {
     const ObservationInterface* observation = Observation();
     Units geysers = observation->GetUnits(Unit::Alliance::Neutral, IsVespeneGeyser());
@@ -158,6 +170,8 @@ bool OrionBot::TryBuildBarracks() {
     return TryBuildStructure(ABILITY_ID::BUILD_BARRACKS);
 }
 
+//Try to build factory, once we have 9 supply depots.
+//Made by: Joe
 bool OrionBot::TryBuildOrbitalCommand() {
     const ObservationInterface* observation = Observation();
     if (CountUnitType(UNIT_TYPEID::TERRAN_SUPPLYDEPOT) > 9) {
@@ -170,6 +184,8 @@ bool OrionBot::TryBuildOrbitalCommand() {
     return TryBuildStructure(ABILITY_ID::LAND_ORBITALCOMMAND);
 }
 
+//Try to build factory, once we have 12 SCVs
+//Made by: Joe
 bool OrionBot::TryBuildFactory() {
     const ObservationInterface* observation = Observation();
     if (CountUnitType(UNIT_TYPEID::TERRAN_SCV) > 12) {
