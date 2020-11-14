@@ -12,11 +12,11 @@ void OrionBot::OnStep() {
     // Build Barracks 
     TryBuildBarracks();
 
-    //TryBuildRefinery();
-    //TryBuildOrbitalCommand();
-    //TryBuildFactory();
+    // build as much marines while possible
+    TryBuildMarine();
+
     /*TryScouting();*/
-    //TryAttacking();
+    TryAttacking();
 }
 
 void OrionBot::OnUnitIdle(const Unit* unit) {
@@ -214,6 +214,38 @@ bool OrionBot::TryBuildFactory() {
         return false;
     }
     return TryBuildStructure(ABILITY_ID::BUILD_FACTORY);
+}
+
+/*
+ * Fix!
+ * ~Asma
+*/
+bool OrionBot::TryBuildMarine() {
+    //return TryBuildUnit(ABILITY_ID::TRAIN_MARINE, UNIT_TYPEID::TERRAN_BARRACKS);
+    const ObservationInterface* observation = Observation();
+    //If we are at supply cap, don't build anymore units, unless its an overlord.
+    if (observation->GetFoodUsed() >= observation->GetFoodCap() && ABILITY_ID::TRAIN_MARINE != ABILITY_ID::TRAIN_OVERLORD) {
+        return false;
+    }
+    const Unit* unit = nullptr;
+    Units my_units = observation->GetUnits(Unit::Alliance::Self);
+    for (const auto u : my_units) {
+        if (u->unit_type == UNIT_TYPEID::TERRAN_BARRACKS) {
+            unit = u;
+            if (!unit->orders.empty()) {
+                return false;
+            }
+
+            if (unit->build_progress != 1) {
+                return false;
+            }
+
+            Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE);
+            return true;
+        }
+    }
+    return false;
+   
 }
 
 /* 
