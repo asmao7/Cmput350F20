@@ -22,43 +22,36 @@ void OrionBot::OnStep() {
     //TryAttacking();
 }
 
-void OrionBot::OnUnitIdle(const Unit* unit){
+void OrionBot::OnUnitIdle(const Unit* unit) {
     switch (unit->unit_type.ToType()) {
-        case UNIT_TYPEID::TERRAN_COMMANDCENTER: {
-            Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
+    case UNIT_TYPEID::TERRAN_COMMANDCENTER: {
+        Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
+        break;
+    }
+    case UNIT_TYPEID::TERRAN_SCV: {
+        const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
+        const bool vespene_target = FindNearestVespeneGeyser(unit->pos);
+        if (!mineral_target) {
             break;
         }
-        case UNIT_TYPEID::TERRAN_SCV: {
-            const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
-            const Unit* vespene_geyser = FindNearestVespeneGeyser(unit->pos);
-            if (!mineral_target) {
-                break;
-            }
-            if (!vespene_geyser) {
-                break;
-            }
-            else {
-                Actions()->UnitCommand(unit, ABILITY_ID::SMART, vespene_geyser);
-            }
-            Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
+        if (vespene_target) {
             break;
         }
-        case UNIT_TYPEID::TERRAN_BARRACKS: {
-            Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE);
-            break;
-        }
-        case UNIT_TYPEID::TERRAN_MARINE: {
-            const GameInfo& game_info = Observation()->GetGameInfo();
-            Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
-            break;
-        }
-        case UNIT_TYPEID::TERRAN_ORBITALCOMMAND: {
-            Actions()->UnitCommand(unit, ABILITY_ID::MORPH_ORBITALCOMMAND);
-            break;
-        }
-        default: {
-            break;
-        }
+        Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
+        break;
+    }
+    case UNIT_TYPEID::TERRAN_BARRACKS: {
+        Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE);
+        break;
+    }
+    case UNIT_TYPEID::TERRAN_MARINE: {
+        const GameInfo& game_info = Observation()->GetGameInfo();
+        Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
+        break;
+    }
+    default: {
+        break;
+    }
     }
 }
 
@@ -93,6 +86,34 @@ bool OrionBot::TryBuildStructure(ABILITY_ID ability_type_for_structure, UNIT_TYP
         Point2D(unit_to_build->pos.x + rx * 15.0f, unit_to_build->pos.y + ry * 15.0f));
 
     return true;
+}
+bool OrionBot::TryBuildStructureTargeted(ABILITY_ID ability_type_for_structure, Tag location_tag, UNIT_TYPEID unit_type = UNIT_TYPEID::TERRAN_SCV) {
+    const ObservationInterface* observation = Observation();
+    Units workers = observation->GetUnits(Unit::Alliance::Self, IsUnit(unit_type));
+    const Unit* target = observation->GetUnit(location_tag);
+
+    if (workers.empty()) {
+        return false;
+    }
+
+    // Check to see if there is already a worker heading out to build it
+    for (const auto& worker : workers) {
+        for (const auto& order : worker->orders) {
+            if (order.ability_id == ability_type_for_structure) {
+                return false;
+            }
+        }
+    }
+
+    // If no worker is already building one, get a random worker to build one
+    const Unit* unit = GetRandomEntry(workers);
+
+    // Check to see if unit can build there
+    if (Query()->Placement(ability_type_for_structure, target->pos)) {
+        Actions()->UnitCommand(unit, ability_type_for_structure, target);
+        return true;
+    }
+    return false;
 }
 
 bool OrionBot::TryBuildSupplyDepot() {
@@ -130,15 +151,9 @@ bool OrionBot::TryBuildBarracks() {
     return TryBuildStructure(ABILITY_ID::BUILD_BARRACKS);
 }
 
-//Build a refinery.
-//Made by: Joe
-bool OrionBot::TryBuildRefinery() {
-    const ObservationInterface* observation = Observation();
 
-    return TryBuildStructure(ABILITY_ID::BUILD_REFINERY);
-}
 
-//trybuildgas
+//
 const Unit* OrionBot::FindNearestMineralPatch(const Point2D& start) {
     Units units = Observation()->GetUnits(Unit::Alliance::Neutral);
     float distance = std::numeric_limits<float>::max();
@@ -155,33 +170,28 @@ const Unit* OrionBot::FindNearestMineralPatch(const Point2D& start) {
     return target;
 }
 
-//Check if unit is a vespene geyser.
-//Made by: Joe
-struct IsVespeneGeyser {
-    bool operator()(const Unit& unit) {
-        switch (unit.unit_type.ToType()) {
-        case UNIT_TYPEID::NEUTRAL_VESPENEGEYSER: return true;
-        default: return false;
-        }
-    }
-};
 
 //Find nearest vespene geyser to the scv.
 //Takes in a point.
 //Made by: Joe
-const Unit* OrionBot::FindNearestVespeneGeyser(const Point2D& start) {
-    const ObservationInterface* observation = Observation();
-    Units geysers = observation->GetUnits(Unit::Alliance::Neutral, IsVespeneGeyser());
+const bool OrionBot::FindNearestVespeneGeyser(const Point2D& start) {
+    Units geysers = Observation()->GetUnits(Unit::Alliance::Neutral,IsGeyser());
     float distance = std::numeric_limits<float>::max();
     const Unit* target = nullptr;
+    float minimum_distance = 15.0f;
+    Tag closestGeyser = 0;
     for (const auto& u : geysers) {
         float d = DistanceSquared2D(u->pos, start);
         if (d < distance) {
             distance = d;
             target = u;
+            closestGeyser = u->tag;
         }
     }
-    return target;
+    if (closestGeyser == 0) {
+        return false;
+    }
+    return TryBuildStructureTargeted(ABILITY_ID::BUILD_REFINERY,closestGeyser);
 }
 
 
