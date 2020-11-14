@@ -8,6 +8,8 @@
 #include "sc2utils/sc2_arg_parser.h"
 #include "sc2api/sc2_unit_filters.h"
 
+#include <cstddef>
+
 using namespace sc2;
 
 class OrionBot : public sc2::Agent {
@@ -20,15 +22,26 @@ private:
 	size_t CountUnitType(UNIT_TYPEID unit_type);
 	bool TryBuildStructure(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type);
 	bool TryBuildSupplyDepot();
+	bool TryBuildBarracks();
+	void TryAttacking();
+	void TryScouting();
+	void TryBuild();
+
 	const Unit* FindNearestMineralPatch(const Point2D& start);
 	const Unit* FindNearestVespeneGeyser(const Point2D& start);
-	bool TryBuildBarracks();
 	bool TryBuildRefinery();
 	bool TryBuildAcademy();
 	bool TryBuildOrbitalCommand();
 	bool TryBuildFactory();
-	void TryAttacking();
-	void TryScouting();
+	bool TryBuildSCVs();
+
+	bool TryBuildCommandCentre();
+	const Unit* scouts = NULL;
+	const Unit* baseUnit = NULL;
+
+	bool FindEnemyStructure(const ObservationInterface* observation, const Unit*& enemy_unit);
+	bool FindEnemyPosition(Point2D& target_pos);
+	
 
 };
 
