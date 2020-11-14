@@ -5,13 +5,16 @@ void OrionBot::OnGameStart() {
 }
 
 void OrionBot::OnStep() { 
+    TryBuildOrbitalCommand();
     TryBuildSupplyDepot();
     /*TryBuildRefinery();*/
     TryBuildBarracks();
-    /*TryBuildOrbitalCommand();*/
-    /*TryBuildFactory();*/ //Works
+    TryBuildCommandCenter();
+    TryBuildFactory();
     /*TryScouting();*/
     TryAttacking();
+    /*TryBuildStarport();
+    TryBuildHellion();*/
     /*std::cout << refinery_list.size() << std::endl;*/
 }
 
@@ -204,7 +207,7 @@ bool OrionBot::TryBuildBarracks() {
     if (CountUnitType(UNIT_TYPEID::TERRAN_SUPPLYDEPOT) < 1) {
         return false;
     }
-    if (CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) > 0) {
+    if (CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) > 4) {
         return false;
     }
     return TryBuildStructure(ABILITY_ID::BUILD_BARRACKS);
@@ -212,29 +215,63 @@ bool OrionBot::TryBuildBarracks() {
 
 //Try to build factory, once we have 9 supply depots.
 //Made by: Joe
-bool OrionBot::TryBuildOrbitalCommand() {
-    const ObservationInterface* observation = Observation();
-    if (CountUnitType(UNIT_TYPEID::TERRAN_SUPPLYDEPOT) > 9) {
-        return false;
-    }
-    if (CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) > 1) {
-        return false;
-    }
-    //Fix
-    return TryBuildStructure(ABILITY_ID::LAND_ORBITALCOMMAND);
-}
+//bool OrionBot::TryBuildOrbitalCommand() {
+//    const ObservationInterface* observation = Observation();
+//    if (CountUnitType(UNIT_TYPEID::TERRAN_SUPPLYDEPOT) > 9) {
+//        return false;
+//    }
+//    if (CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) > 1) {
+//        return false;
+//    }
+//    //Fix
+//    return TryBuildStructure(ABILITY_ID::LAND_ORBITALCOMMAND);
+//}
 
 //Try to build factory, once we have 12 SCVs
 //Made by: Joe
 bool OrionBot::TryBuildFactory() {
     const ObservationInterface* observation = Observation();
-    if (CountUnitType(UNIT_TYPEID::TERRAN_SCV) > 12) {
+    if (CountUnitType(UNIT_TYPEID::TERRAN_SCV) < 15) {
+        return false;
+    }
+    if (CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) == 1) {
         return false;
     }
     return TryBuildStructure(ABILITY_ID::BUILD_FACTORY);
 }
 
+bool OrionBot::TryBuildOrbitalCommand() {
+    /*if (CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) > 1) {
+        return false;
+    }*/
+    Units command_centers = Observation()->GetUnits(Unit::Alliance::Self, IsTownHall());
+    if (command_centers.size() != 0) {
+        Actions()->UnitCommand(command_centers.front(), ABILITY_ID::MORPH_ORBITALCOMMAND);
+        return true;
+    }
+    return false;
+}
 
+bool OrionBot::TryBuildStarport() {
+    if (CountUnitType(UNIT_TYPEID::TERRAN_STARPORT) > 1) {
+        return false;
+    }
+    return TryBuildStructure(ABILITY_ID::BUILD_STARPORT);
+}
+
+bool OrionBot::TryBuildHellion() {
+    if (CountUnitType(UNIT_TYPEID::TERRAN_HELLION) > 1) {
+        return false;
+    }
+    return TryBuildStructure(ABILITY_ID::MORPH_HELLION);
+}
+
+bool OrionBot::TryBuildCommandCenter() {
+    if (CountUnitType(UNIT_TYPEID::TERRAN_COMMANDCENTER) > 2) {
+        return false;
+    }
+    return TryBuildStructure(ABILITY_ID::BUILD_COMMANDCENTER);
+}
 
 
 /*

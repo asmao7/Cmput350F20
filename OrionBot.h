@@ -28,10 +28,13 @@ private:
 	bool TryBuildBarracks();
 	bool TryBuildAcademy();
 	bool AddWorkersToRefineries(const Unit* unit);
-	bool TryBuildOrbitalCommand();
 	bool TryBuildFactory();
 	void TryAttacking();
 	void TryScouting();
+	bool TryBuildOrbitalCommand();
+	bool TryBuildStarport();
+	bool TryBuildHellion();
+	bool TryBuildCommandCenter();
 
 	mutable std::vector<Tag> refinery_list;
 };
