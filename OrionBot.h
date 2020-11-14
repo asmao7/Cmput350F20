@@ -35,6 +35,7 @@ private:
 	bool TryBuildOrbitalCommand();
 	bool TryBuildFactory();
 	bool TryBuildSCVs();
+	bool TryBuildMarine();
 
 	bool TryBuildCommandCentre();
 	const Unit* scouts = NULL;
