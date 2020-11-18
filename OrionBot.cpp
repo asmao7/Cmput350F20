@@ -7,17 +7,19 @@ void OrionBot::OnGameStart() {
 void OrionBot::OnStep() { 
 
     // build supply depots
-    TryBuildSupplyDepot();
+    //TryBuildSupplyDepot();
 
-    // Build Barracks 
-    TryBuildBarracks();
-
+    //// Build Barracks 
+    //TryBuildBarracks();
+    OrionBot::BansheeBuild();
 }
 
 void OrionBot::OnUnitIdle(const Unit* unit) {
     switch (unit->unit_type.ToType()) {
     case UNIT_TYPEID::TERRAN_COMMANDCENTER: {
-        Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
+        if (orbital_upgrade) {
+            Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
+        }
         break;
     }
     case UNIT_TYPEID::TERRAN_SCV: {
@@ -26,9 +28,9 @@ void OrionBot::OnUnitIdle(const Unit* unit) {
         if (!mineral_target) {
             break;
         }
-        // if (vespene_target) {
-        //     break;
-        // }
+        if (AddWorkersToRefineries(unit)) {
+            break;
+        }
         Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
         break;
     }
@@ -83,19 +85,13 @@ bool OrionBot::TryBuildStructure(ABILITY_ID ability_type_for_structure, UNIT_TYP
 
 bool OrionBot::TryBuildSupplyDepot() {
     const ObservationInterface* observation = Observation();
-    
+
     // If we are not supply capped, don't build a supply depot.
     if (observation->GetFoodUsed() <= observation->GetFoodCap() - 2)
         return false;
 
-    // cost for building depot = 100 minerals
-    //if (observation->GetMinerals() < 100) {
-     //   return false;
-    //}
-
     // Try and build a depot. Find a random SCV and give it the order.
     return TryBuildStructure(ABILITY_ID::BUILD_SUPPLYDEPOT);
-    
 }
 
 bool OrionBot::TryBuildBarracks() {
@@ -105,13 +101,9 @@ bool OrionBot::TryBuildBarracks() {
         return false;
     }
 
-    if (CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) > 3) {
+    /*if (CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) > 0) {
         return false;
-    }
-
-    if (CountUnitType(UNIT_TYPEID::TERRAN_REFINERY) < 1) {
-        return false;
-    }
+    }*/
 
     return TryBuildStructure(ABILITY_ID::BUILD_BARRACKS);
 }

@@ -26,8 +26,9 @@ private:
 	const Unit* FindNearestMineralPatch(const Point2D& start);
 	bool TryBuildSupplyDepot();
 	bool TryBuildBarracks();
+	bool orbital_upgrade = true;
 	#include "BuildManager.h"
-	
+	#include "Banshee.h"
 };
 
 #endif
