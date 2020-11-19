@@ -30,9 +30,19 @@ private:
 	//Global State Tracker
 	//Lets us know what strategy we are playing
 	enum RushStrategy { RUSH_BANSHEE = 0, RUSH_12MARINES, RUSH_6RAX };
-	int RUSH_STRATEGY = RUSH_BANSHEE;
+	//int RUSH_STRATEGY = RUSH_BANSHEE;
+	int RUSH_STRATEGY = RUSH_6RAX;
 
 	//6Rax Rush Strategy Variables
+	//Made by: Asma
+	struct Rax6 {
+		Rax6() :
+			upgradeOrbital(false), currentBuild(0) {}
+		bool upgradeOrbital;
+		int currentBuild;
+	};
+	Rax6 RAX6_STATE;
+	enum Rax6_Strategy { STAGE1_RAX6 = 0, STAGE2_RAX6, STAGE3_RAX6, STAGE4_RAX6 };
 
 
 	//12 Marines Rush Strategy Variables
@@ -55,6 +65,9 @@ private:
 	};
 	Banshee BANSHEE_STATE;
 	enum Banshee_Strategy { STAGE1_BANSHEE = 0, STAGE2_BANSHEE, STAGE3_BANSHEE, STAGE4_BANSHEE };
+
+
+	
 
 	#include "BuildManager.h"
 	#include "Banshee.h"
