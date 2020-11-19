@@ -64,6 +64,7 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 		if (RAX6_STATE.upgradeOrbital) {
 			Actions()->UnitCommand(unit, ABILITY_ID::MORPH_ORBITALCOMMAND);
 			// call build on choke point
+			TryBuildCommandCentreChokeP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV);
 		}
 		else {
 			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
@@ -134,4 +135,68 @@ bool OrionBot::TryBuildSupplyDepotChokePoint() {
 
 bool OrionBot::TryBuildBarracksChokePoint() {
 	return false;
+}
+
+
+
+
+//Expands to nearest location and updates the start location to be between the new location and old bases.
+bool OrionBot::TryBuildCommandCentreChokeP(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type) {
+	const ObservationInterface* observation = Observation();
+	Point3D startLocation_ = Observation()->GetStartLocation();
+	Point3D staging_location_ = startLocation_;
+	std::vector<Point3D> expansions_ = search::CalculateExpansionLocations(Observation(), Query());
+	Point2D closest_expansion;
+	float minimum_distance = std::numeric_limits<float>::max();
+	//Point3D closest_expansion;
+	for (const auto& expansion : expansions_) {
+		float current_distance = Distance2D(startLocation_, expansion);
+		if (current_distance < .01f) {
+			continue;
+		}
+
+		if (current_distance < minimum_distance) {
+			if (Query()->Placement(ABILITY_ID::BUILD_COMMANDCENTER, expansion)) {
+				closest_expansion = expansion;
+				minimum_distance = current_distance;
+			}
+		}
+	}
+	/*
+	//only update staging location up till 3 bases.
+	if (TryBuildStructure(ABILITY_ID::BUILD_COMMANDCENTER, worker_type, closest_expansion, true) && observation->GetUnits(Unit::Self, IsTownHall()).size() < 4) {
+		staging_location_ = Point3D(((staging_location_.x + closest_expansion.x) / 2), ((staging_location_.y + closest_expansion.y) / 2),
+			((staging_location_.z + closest_expansion.z) / 2));
+		return true;
+	}
+	return false;*/
+
+	//const ObservationInterface* observation = Observation();
+
+	// If a unit already is building a supply structure of this type, do nothing.
+	// Also get an scv to build the structure.
+	const Unit* unit_to_build = nullptr;
+	Units units = observation->GetUnits(Unit::Alliance::Self);
+	for (const auto& unit : units) {
+		for (const auto& order : unit->orders) {
+			if (order.ability_id == ability_type_for_structure) {
+				return false;
+			}
+		}
+
+		if (unit->unit_type == unit_type) {
+			unit_to_build = unit;
+		}
+	}
+
+	Point2D toBuildCC = closest_expansion;
+	float rx = toBuildCC.x;
+	float ry = toBuildCC.y;
+
+	Actions()->UnitCommand(unit_to_build,
+		ability_type_for_structure,
+		Point2D(rx, ry));
+
+	return true;
+
 }
