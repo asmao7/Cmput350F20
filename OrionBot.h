@@ -35,6 +35,7 @@ private:
 
 	//6Rax Rush Strategy Variables
 	//Made by: Asma
+	int max_worker_count_ = 70;
 	struct Rax6 {
 		Rax6() :
 			upgradeOrbital(false), newCommandCentre(false), currentBuild(0) {}
