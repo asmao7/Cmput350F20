@@ -61,15 +61,15 @@ void OrionBot::Marines12Build() {
 					then Calldown: MULE
 					then  Scanner Sweep (in the corners)*/
 
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND)) {
+			MARINES12_STATE.orbital_command_upgraded = true;
+		}
 		if (Observation()->GetMinerals() >= 150 && OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) < 4) {
 			OrionBot::TryBuildBarracks();
 		}
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) >= 3) { // NEED TO CHECK TIME 4:30 ???
 			MARINES12_STATE.current_build++;
 		}
-
-
-
 
 		break;
 
