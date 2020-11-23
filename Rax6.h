@@ -54,8 +54,12 @@ void OrionBot::Rax6Build() {
 		
 	case STAGE2_RAX6:
 		TryBuildCommandCentreChokeP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV);
+		if ((RAX6_STATE.newCommandCentre == true)) {
+			RAX6_STATE.currentBuild++;
+			break;
+		}
 		//TryBuildExpansionCom();
-		break;
+		//break;
 
 	case STAGE3_RAX6:
 		TryBuildSupplyDepot();
@@ -82,7 +86,9 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 			if (!mineral_target) {
 				break;
 			}
-			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE);
+			//Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE);
+			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_SCAN, Point2D(158.5, 33.5));
+			std::cout << "SCANNEDDDDD" << std::endl;
 		}
 		break;
 	}
@@ -148,6 +154,7 @@ bool OrionBot::TryBuildCommandCentreChokeP(ABILITY_ID ability_type_for_structure
 
 	const ObservationInterface* observation = Observation();
 	Point3D startLocation_ = Observation()->GetStartLocation();
+	std::cout << "STARTING POS: " << startLocation_.x << "," << startLocation_.y << std::endl;
 	Point3D staging_location_ = startLocation_;
 	std::vector<Point3D> expansions_ = search::CalculateExpansionLocations(Observation(), Query());
 	Point2D closest_expansion;
@@ -189,7 +196,8 @@ bool OrionBot::TryBuildCommandCentreChokeP(ABILITY_ID ability_type_for_structure
 		ability_type_for_structure,
 		Point2D(rx, ry));
 
-	RAX6_STATE.currentBuild++;
+	//RAX6_STATE.currentBuild++;
+	RAX6_STATE.newCommandCentre = true;
 	return true;
 
 }

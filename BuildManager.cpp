@@ -236,9 +236,3 @@ bool OrionBot::FindEnemyPosition(Point2D& target_pos) {
     target_pos = game_info.enemy_start_locations.front();
     return true;
 }
-
-/*
- * NOTE: I USED THE API A LOT
- * WILL CITE PROPERLY LATER
- * ~Asma
-*/
