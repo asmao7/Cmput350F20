@@ -31,9 +31,21 @@ private:
 	//Lets us know what strategy we are playing
 	enum RushStrategy { RUSH_BANSHEE = 0, RUSH_12MARINES, RUSH_6RAX };
 	//int RUSH_STRATEGY = RUSH_BANSHEE;
-	int RUSH_STRATEGY = RUSH_12MARINES;
+	int RUSH_STRATEGY = RUSH_6RAX;
+	//int RUSH_STRATEGY = RUSH_12MARINES;
 
 	//6Rax Rush Strategy Variables
+	//Made by: Asma
+	int max_worker_count_ = 70;
+	struct Rax6 {
+		Rax6() :
+			upgradeOrbital(false), newCommandCentre(false), currentBuild(0) {}
+		bool upgradeOrbital;
+		bool newCommandCentre;
+		int currentBuild;
+	};
+	Rax6 RAX6_STATE;
+	enum Rax6_Strategy { STAGE1_RAX6 = 0, STAGE2_RAX6, STAGE3_RAX6, STAGE4_RAX6 };
 
 
 	//12 Marines Rush Strategy Variables
