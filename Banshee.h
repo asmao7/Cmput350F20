@@ -67,10 +67,10 @@ void OrionBot::BansheeBuild() {
 			23 - Refinery(2) + Supply Depot*/
 			BANSHEE_STATE.orbital_upgrade = false;
 			OrionBot::TryBuildSupplyDepot();
-			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_COMMANDCENTER) < 1) {
+			/*if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_COMMANDCENTER) < 1) {
 				OrionBot::TryBuildCommandCentre();
 				OrionBot::TryBuildSupplyDepot();
-			}
+			}*/
 			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_STARPORT) < 1) {
 				OrionBot::TryBuildStarport();
 			}
@@ -168,7 +168,10 @@ void OrionBot::BansheeOnUnitIdle(const Unit* unit) {
 			if (!mineral_target) {
 				break;
 			}
-			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE);
+			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE,mineral_target);
+		}
+		else {
+			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
 		}
 		break;
 	}

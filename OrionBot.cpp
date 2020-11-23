@@ -5,7 +5,7 @@ void OrionBot::OnGameStart() {
 }
 
 void OrionBot::OnStep() { 
-    OrionBot::BansheeBuild();
+    /*OrionBot::BansheeBuild();*/
     switch (RUSH_STRATEGY) {
     case RUSH_BANSHEE: {
         OrionBot::BansheeBuild();
