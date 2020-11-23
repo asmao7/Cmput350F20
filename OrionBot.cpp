@@ -15,6 +15,7 @@ void OrionBot::OnStep() {
             break;
         }
         case RUSH_6RAX: {
+            OrionBot::Rax6Build();
             break;
         }
     }
@@ -31,6 +32,7 @@ void OrionBot::OnUnitIdle(const Unit* unit) {
             break;
         }
         case RUSH_6RAX: {
+            OrionBot::Rax6OnUnitIdle(unit);
             break;
         }
     }
