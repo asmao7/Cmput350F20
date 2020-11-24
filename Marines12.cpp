@@ -46,7 +46,11 @@ void OrionBot::Marines12Build() {
 		}
 
 		break;
-
+	case STAGE4_ATTACK_MARINES:
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_MARINE) >= 10) {
+			MARINES12_STATE.attacking = true;
+		}
+		
 	}
 }
 
@@ -61,33 +65,38 @@ void OrionBot::Marines12OnUnitIdle(const Unit* unit) {
 		}
 		break;
 	}
-	case UNIT_TYPEID::TERRAN_ORBITALCOMMAND: {		
+	case UNIT_TYPEID::TERRAN_ORBITALCOMMAND: {	
+		std::cout << "here";
 		if (unit->energy < 50) {
 			break;
 		}
-
-		const ObservationInterface* observation = Observation();
-		Units bases = observation->GetUnits();
-		
-		for (const auto& base : bases) {
-			if (base->unit_type == UNIT_TYPEID::TERRAN_SUPPLYDEPOT) {
-				Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_SUPPLYDROP, base);
-			}
+		std::cout << "AAAA";
+		if (!MARINES12_STATE.supplies_called) {
+			tryCalldownExtraSupplies(unit);
 		}
-
-		if (FindNearestMineralPatch(unit->pos)) {
-			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE, FindNearestMineralPatch(unit->pos));
-		}
+		tryCalldownMULE(unit);
 		
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_SCV: {
-		const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
-		if (!mineral_target) {
-			break;
+		const GameInfo& game_info = Observation()->GetGameInfo();
+		
+		if (MARINES12_STATE.num_units_scouting < game_info.enemy_start_locations.size()) {
+			// send csv to one of the corners
+			
+			Actions()->UnitCommand(unit, ABILITY_ID::MOVE_MOVE, game_info.enemy_start_locations[MARINES12_STATE.num_units_scouting]);
+
+			MARINES12_STATE.num_units_scouting++;
+		}
+		else {
+			const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
+			if (!mineral_target) {
+				break;
+			}
+
+			Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
 		}
 
-		Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_BARRACKS: {
@@ -95,12 +104,48 @@ void OrionBot::Marines12OnUnitIdle(const Unit* unit) {
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_MARINE: {
-		const GameInfo& game_info = Observation()->GetGameInfo();
-		Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
+		if (MARINES12_STATE.attacking) {
+			const GameInfo& game_info = Observation()->GetGameInfo();
+			// there are 3 enemy_start_locations
+			Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, locations_enemy_seen.front());
+		}
 		break;
 	}
 	default: {
 		break;
 	}
+	}
+}
+
+void OrionBot::tryCalldownMULE(const Unit* unit) {
+	if (FindNearestMineralPatch(unit->pos)) {
+		Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE, FindNearestMineralPatch(unit->pos));
+	}
+}
+
+void OrionBot::tryCalldownExtraSupplies(const Unit* unit) {
+	const ObservationInterface* observation = Observation();
+	Units bases = observation->GetUnits();
+
+	for (const auto& base : bases) {
+		if (base->unit_type == UNIT_TYPEID::TERRAN_SUPPLYDEPOT) {
+			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_SUPPLYDROP, base);
+			MARINES12_STATE.supplies_called = true;
+		}
+	}
+}
+
+/*void SCOUT_BOT::unitEnterVision(const sc2::Unit * u) {
+	// if unit is enemy, record spotting
+	if (u->alliance == Unit::Alliance::Enemy) {
+		auto now = std::chrono::steady_clock::now();
+		detection_record.emplace_back(*u, Point2D(u->pos), now);
+	}
+}*/
+
+void OrionBot::OnUnitEnterVision(const Unit* unit) {
+	if (unit->alliance == Unit::Alliance::Enemy) {
+		//std::cout << "See enemy" << std::endl;
+		locations_enemy_seen.push_back(Point2D(unit->pos));
 	}
 }
