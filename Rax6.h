@@ -68,6 +68,14 @@ void OrionBot::Rax6Build() {
 		TryBuildSupplyDepot();
 		TryBuildBarracks();
 		//TryBuildMarine();
+		break;
+
+	case STAGE4_RAX6:
+		TryBuildSupplyDepot();
+		TryBuildBarracks();
+		//TryBuildMarine();
+		break;
+
 	}
 }
 
@@ -126,7 +134,15 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 		
 	}
 
+	case UNIT_TYPEID::TERRAN_BARRACKS: {
+		Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE);
+		break;
+	}
+
 	case UNIT_TYPEID::TERRAN_MARINE: {
+		if (CountUnitType(UNIT_TYPEID::TERRAN_MARINE) > 50) {
+			RAX6_STATE.attacking = true;
+		}
 		if (RAX6_STATE.attacking) {
 			const GameInfo& game_info = Observation()->GetGameInfo();
 			// there are 3 enemy_start_locations
