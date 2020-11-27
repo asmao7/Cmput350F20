@@ -20,7 +20,7 @@ void OrionBot::Marines12Build() {
 			// Start producing Marines, stop producing CSVs
 			// Allow Orbital Upgrade
 			MARINES12_STATE.produce_scv = false;
-			MARINES12_STATE.produce_marine = true;
+			//MARINES12_STATE.produce_marine = true;
 			MARINES12_STATE.orbital_upgrade = true;
 
 			MARINES12_STATE.current_build++;
