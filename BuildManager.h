@@ -11,7 +11,7 @@ void TryBuildOrbitalCommand();
 bool TryBuildStarport();
 bool TryBuildHellion();
 bool TryBuildSCVs();
-//bool TryBuildMarine();
+bool TryBuildMarine();
 
 bool TryBuildCommandCentre();
 const Unit* scouts = NULL;

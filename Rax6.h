@@ -19,7 +19,7 @@
 
 	STAGE4
 	- more barracks to train marines for attacking		  ~done
-	- build the barracks in a line to shield the CC		
+	- build the barracks in a line to shield the CC
 	- the build locations should be specified not random  ~not working as expected
 */
 
@@ -44,7 +44,6 @@ void OrionBot::Rax6Build() {
 		}
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) < 1) {
 			OrionBot::TryBuildStructureAtCP(ABILITY_ID::BUILD_BARRACKS, UNIT_TYPEID::TERRAN_SCV, RAX6_STATE.tobuildRaxs);
-			//TryBuildBarracks();
 		}
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) > 0) {
 			RAX6_STATE.upgradeOrbital = true;
@@ -52,34 +51,23 @@ void OrionBot::Rax6Build() {
 
 		if (CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) > 0) {
 			RAX6_STATE.upgradeOrbital = false;
+			//RAX6_STATE.newCommandCentre = true;
 			RAX6_STATE.currentBuild++;
 		}
 		break;
 
 	case STAGE2_RAX6:
-		TryBuildCommandCentreChokeP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV);
+		TryBuildCommandCentreExpansion(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV);
+		RAX6_STATE.expand = true;
 		if ((RAX6_STATE.newCommandCentre == true)) {
 			RAX6_STATE.currentBuild++;
 			break;
 		}
 
 	case STAGE3_RAX6:
-		for (int i = 0; i < 5; i++) {
-			TryBuildSupplyDepot();
-			const ObservationInterface* observation = Observation();
-			OrionBot::getNextBarrackLocation();
-			//OrionBot::TryBuildStructureAtCP(ABILITY_ID::BUILD_BARRACKS, UNIT_TYPEID::TERRAN_SCV, RAX6_STATE.barracks);
-			TryBuildBarracks();
-			TryBuildMarine();
-		}
-		RAX6_STATE.currentBuild++;
-		break;
-
-	case STAGE4_RAX6:
 		TryBuildSupplyDepot();
 		TryBuildBarracks();
-		RAX6_STATE.attacking = true;
-		TryBuildMarine();
+		//TryBuildMarine();
 	}
 }
 
@@ -92,35 +80,24 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 		else {
 			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
 		}
-		
+
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_ORBITALCOMMAND: {
-
 		if (unit->energy > 50) {
 			const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
 			if (!mineral_target) {
 				break;
 			}
-			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE);
+			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE, mineral_target);
 			//Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_SCAN, Point2D(150, 33.5));
-			
+		}
+		else {
+			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
 		}
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_SCV: {
-		/*
-		const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
-		// const bool vespene_target = FindNearestVespeneGeyser(unit->pos);
-		if (!mineral_target) {
-			break;
-		}
-		if (AddWorkersToRefineries(unit)) {
-			break;
-		}
-		Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
-		break;*/ 
-
 		const GameInfo& game_info = Observation()->GetGameInfo();
 
 		if (RAX6_STATE.num_units_scouting < game_info.enemy_start_locations.size()) {
@@ -132,31 +109,24 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 			enemyBaseValue.push_back(0);
 			RAX6_STATE.num_units_scouting++;
 		}
-		else {
-			const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
-			if (!mineral_target) {
-				break;
+		else if(RAX6_STATE.expand){
+			Point2D enemyPos = FindEnemyBase();
+			for (int i = 0; i < 3; i++) {
+				if ((possible_enemy_bases[i]) != enemyPos) {
+					TryBuildStructureAtCP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV, possible_enemy_bases[i]);
+				}
 			}
-
-			Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
 		}
+		const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
+		if (!mineral_target) {
+			break;
+		}
+		Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
 		break;
-	}
-	case UNIT_TYPEID::TERRAN_BARRACKS: {
-		if (BANSHEE_STATE.morph_reactor) {
-			Actions()->UnitCommand(unit, ABILITY_ID::BARRACKSREACTORMORPH_REACTOR);
-		}
-		else {
-			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE);
-		}
 		
-		break;
 	}
-	
+
 	case UNIT_TYPEID::TERRAN_MARINE: {
-		/*const GameInfo& game_info = Observation()->GetGameInfo();
-		Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
-		break;*/ 
 		if (RAX6_STATE.attacking) {
 			const GameInfo& game_info = Observation()->GetGameInfo();
 			// there are 3 enemy_start_locations
@@ -171,7 +141,7 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 		Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
 		break;
 	}
-	
+
 	default: {
 		break;
 	}
@@ -179,8 +149,11 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 }
 
 
-//Build a new command centre at the choke point.
-bool OrionBot::TryBuildCommandCentreChokeP(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type) {
+
+/* 
+* Build a new command centre at the expansion location.
+*/
+bool OrionBot::TryBuildCommandCentreExpansion(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type) {
 
 	const ObservationInterface* observation = Observation();
 	Point3D startLocation_ = Observation()->GetStartLocation();
@@ -201,7 +174,7 @@ bool OrionBot::TryBuildCommandCentreChokeP(ABILITY_ID ability_type_for_structure
 			}
 		}
 	}
-	
+
 	// If a unit already is building a supply structure of this type, do nothing.
 	// Also get an scv to build the structure.
 	const Unit* unit_to_build = nullptr;
@@ -222,7 +195,6 @@ bool OrionBot::TryBuildCommandCentreChokeP(ABILITY_ID ability_type_for_structure
 	float rx = toBuildCC.x;
 	float ry = toBuildCC.y;
 
-	std::cout << "TO BUILD.X = " << toBuildCC.x << " ," << toBuildCC.y << std::endl;
 	Actions()->UnitCommand(unit_to_build,
 		ability_type_for_structure,
 		Point2D(rx, ry));
@@ -234,6 +206,9 @@ bool OrionBot::TryBuildCommandCentreChokeP(ABILITY_ID ability_type_for_structure
 }
 
 
+/* 
+ * Takes in positure and builds the specified structure at the specified location
+*/
 bool OrionBot::TryBuildStructureAtCP(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type, Point2D toBuildPos) {
 	const ObservationInterface* observation = Observation();
 
@@ -253,7 +228,7 @@ bool OrionBot::TryBuildStructureAtCP(ABILITY_ID ability_type_for_structure, UNIT
 			unit_to_build = unit;
 		}
 	}
-	
+
 	if (!bases.empty()) {
 		Actions()->UnitCommand(unit_to_build,
 			ability_type_for_structure,
@@ -269,7 +244,10 @@ bool OrionBot::TryBuildStructureAtCP(ABILITY_ID ability_type_for_structure, UNIT
 	return true;
 }
 
-
+/* 
+ * Set the positions of chike points for SD and rax
+ * for each of the four corners.
+*/
 void OrionBot::setChokePoints() {
 	const ObservationInterface* observation = Observation();
 
@@ -290,38 +268,15 @@ void OrionBot::setChokePoints() {
 	}
 	else if (observation->GetStartLocation().x == RAX6_STATE.TOP_RIGHT.x && observation->GetStartLocation().y == RAX6_STATE.TOP_RIGHT.y) {
 		RAX6_STATE.tobuildSD = Point2D(160, 141);
-		RAX6_STATE.tobuildRaxs = Point2D(162,140);
+		RAX6_STATE.tobuildRaxs = Point2D(162, 140);
 		RAX6_STATE.barracks = Point2D(160, 148);
 	}
 }
 
 
-void OrionBot::getNextBarrackLocation() {
-	const ObservationInterface* observation = Observation();
-	if (observation->GetStartLocation().x == RAX6_STATE.BOTTOM_LEFT.x && observation->GetStartLocation().y == RAX6_STATE.BOTTOM_LEFT.y) {
-		RAX6_STATE.barracks.x += 2;
-		RAX6_STATE.barracks.y += 0;
-	}
-	else if (observation->GetStartLocation().x == RAX6_STATE.BOTTOM_RIGHT.x && observation->GetStartLocation().y == RAX6_STATE.BOTTOM_RIGHT.y) {
-		RAX6_STATE.barracks.x += 0;
-		RAX6_STATE.barracks.y += 2;
-	}
-	else if (observation->GetStartLocation().x == RAX6_STATE.TOP_LEFT.x && observation->GetStartLocation().y == RAX6_STATE.TOP_LEFT.y) {
-		RAX6_STATE.barracks.x += 0;
-		RAX6_STATE.barracks.y -= 2;
-	}
-	else if (observation->GetStartLocation().x == RAX6_STATE.TOP_RIGHT.x && observation->GetStartLocation().y == RAX6_STATE.TOP_RIGHT.y) {
-		RAX6_STATE.barracks.x -= 2;
-		RAX6_STATE.barracks.y += 0;
-	}
-}
-
-
-
 // a
 void OrionBot::OnUnitEnterVision(const Unit* unit) {
 	if (unit->alliance == Unit::Alliance::Enemy) {
-		//std::cout << "See enemy" << std::endl;
 		locations_enemy_seen.push_back(Point2D(unit->pos));
 
 		// find to what base this location is closest to
@@ -350,36 +305,3 @@ Point2D OrionBot::FindEnemyBase() {
 	return point;
 }
 
-
-/*
- * Fix!
- * ~Asma
-*/
-bool OrionBot::TryBuildMarine() {
-	//return TryBuildUnit(ABILITY_ID::TRAIN_MARINE, UNIT_TYPEID::TERRAN_BARRACKS);
-	const ObservationInterface* observation = Observation();
-	//If we are at supply cap, don't build anymore units, unless its an overlord.
-	if (observation->GetFoodUsed() >= observation->GetFoodCap() && ABILITY_ID::TRAIN_MARINE != ABILITY_ID::TRAIN_OVERLORD) {
-		return false;
-	}
-	const Unit* unit = nullptr;
-	Units my_units = observation->GetUnits(Unit::Alliance::Self);
-	for (const auto u : my_units) {
-		if (u->unit_type == UNIT_TYPEID::TERRAN_BARRACKS) {
-			unit = u;
-			if (!unit->orders.empty()) {
-				return false;
-			}
-
-			if (unit->build_progress != 1) {
-				return false;
-			}
-
-			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE, FindEnemyBase());
-			//Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, Point2D(158.5, 158.5));
-			return true;
-		}
-	}
-	return false;
-
-}

@@ -40,10 +40,11 @@ private:
 	struct Rax6 {
 		Rax6() :
 			upgradeOrbital(false), newCommandCentre(false), currentBuild(0),
-			attacking(false), num_units_scouting(0)  {}
+			expand(false), attacking(false), num_units_scouting(0)  {}
 		bool upgradeOrbital;
 		bool newCommandCentre;
 		int currentBuild;
+		bool expand;
 		int num_units_scouting;
 		bool attacking;
 	
