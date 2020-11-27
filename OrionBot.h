@@ -27,13 +27,14 @@ private:
 	const Unit* FindNearestMineralPatch(const Point2D& start);
 	bool TryBuildSupplyDepot();
 	bool TryBuildBarracks();
+	bool TryBuildStructureLocation(AbilityID ability_type_for_structure, UnitTypeID unit_type, Point2D location, bool isExpansion = false);
 
 	//Global State Tracker
 	//Lets us know what strategy we are playing
 	enum RushStrategy { RUSH_BANSHEE = 0, RUSH_12MARINES, RUSH_6RAX };
-	//int RUSH_STRATEGY = RUSH_BANSHEE;
+	int RUSH_STRATEGY = RUSH_BANSHEE;
 	//int RUSH_STRATEGY = RUSH_6RAX;
-	int RUSH_STRATEGY = RUSH_12MARINES;
+	/*int RUSH_STRATEGY = RUSH_12MARINES;*/
 
 	//6Rax Rush Strategy Variables
 	//Made by: Asma
@@ -48,16 +49,12 @@ private:
 	Rax6 RAX6_STATE;
 	enum Rax6_Strategy { STAGE1_RAX6 = 0, STAGE2_RAX6, STAGE3_RAX6, STAGE4_RAX6 };
 
-
-	//12 Marines Rush Strategy Variables
-
-
 	//Banshee Rush Strategy Variables
 	//Made by: Joe
 	struct Banshee {
 		Banshee() :
 			orbital_upgrade(false), produce_hellion(false), produce_banshee(false), 
-			morph_techlab(false), morph_reactor(false), current_build(0)
+			morph_techlab(false), morph_reactor(false), current_build(0), num_units_scouting(0)
 		{
 		}
 		bool orbital_upgrade;
@@ -66,10 +63,13 @@ private:
 		bool morph_techlab;
 		bool morph_reactor;
 		int current_build;
+		int num_units_scouting;
 	};
 	Banshee BANSHEE_STATE;
-	enum Banshee_Strategy { STAGE1_BANSHEE = 0, STAGE2_BANSHEE, STAGE3_BANSHEE, STAGE4_BANSHEE };
+	enum Banshee_Strategy { STAGE1_BANSHEE = 0, STAGE2_BANSHEE, STAGE3_BANSHEE, STAGE4_BANSHEE, STAGE5_BANSHEE};
 
+
+	//12 Marines Rush Strategy Variables
 	struct Marines12 {
 		Marines12() : orbital_upgrade(false), produce_scv(true), current_build(0),
 					orbital_command_upgraded(false), supplies_called(false),
