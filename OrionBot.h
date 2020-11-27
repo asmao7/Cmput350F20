@@ -40,13 +40,31 @@ private:
 	int max_worker_count_ = 70;
 	struct Rax6 {
 		Rax6() :
-			upgradeOrbital(false), newCommandCentre(false), currentBuild(0) {}
+			upgradeOrbital(false), newCommandCentre(false), currentBuild(0),
+			expand(false), attacking(false), num_units_scouting(0)  {}
 		bool upgradeOrbital;
 		bool newCommandCentre;
 		int currentBuild;
+		bool expand;
+		int num_units_scouting;
+		bool attacking;
+	
+		int raxs = 0;
+		Point2D barracks;
+
+		Point2D tobuildSD;
+		Point2D tobuildRaxs;
+
+		Point2D BOTTOM_LEFT = Point2D(33.5, 33.5);	
+		Point2D BOTTOM_RIGHT = Point2D(158.5, 33.5);
+		Point2D TOP_LEFT = Point2D(33.5, 158.5);
+		Point2D TOP_RIGHT = Point2D(158.5, 158.5);
 	};
 	Rax6 RAX6_STATE;
 	enum Rax6_Strategy { STAGE1_RAX6 = 0, STAGE2_RAX6, STAGE3_RAX6, STAGE4_RAX6 };
+	// possible starting location and a possible enemy locations
+	//enum locations{Point2D BOTTOM_LEFT = Point2D(33.5, 33.5), Point2D BOTTOMM_RIGHT = Point2D(158.5, 33.5), 
+		//		   Point2D TOP_LEFT = Point2D(33.5, 158.5),   Point2D TOP_RIGHT = Point2D(158.5, 158.5)};
 
 
 	//12 Marines Rush Strategy Variables
@@ -70,10 +88,29 @@ private:
 	Banshee BANSHEE_STATE;
 	enum Banshee_Strategy { STAGE1_BANSHEE = 0, STAGE2_BANSHEE, STAGE3_BANSHEE, STAGE4_BANSHEE };
 
+	/*
 	struct Marines12 {
 		Marines12() : orbital_upgrade(false), produce_scv(true), current_build(0),
 					orbital_command_upgraded(false), supplies_called(false),
 					attacking(false), num_units_scouting(0)
+		{}
+		int current_build;
+		bool orbital_upgrade;
+		bool produce_scv;
+		bool orbital_command_upgraded;
+		bool supplies_called;
+		bool attacking;
+		int num_units_scouting;
+	};
+
+	Marines12 MARINES12_STATE;
+	enum Marines12_Strategy { STAGE1_MARINES = 0, STAGE2_MARINES, STAGE3_MARINES, STAGE4_ATTACK_MARINES };
+	*/
+
+	struct Marines12 {
+		Marines12() : orbital_upgrade(false), produce_scv(true), current_build(0),
+			orbital_command_upgraded(false), supplies_called(false),
+			attacking(false), num_units_scouting(0)
 		{}
 		int current_build;
 		bool orbital_upgrade;
@@ -91,6 +128,7 @@ private:
 
 	std::vector<Point2D> possible_enemy_bases;
 	std::vector<int> enemyBaseValue;
+
 	//std::map<Point2D, int> possible_enemy_bases;
 	#include "BuildManager.h"
 	#include "Banshee.h"

@@ -124,6 +124,7 @@ bool OrionBot::TryBuildMarine() {
             }
 
             Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE);
+            //Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, Point2D(158.5, 158.5));
             return true;
         }
     }
