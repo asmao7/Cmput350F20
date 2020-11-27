@@ -44,6 +44,7 @@ void OrionBot::Rax6Build() {
 		}
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) < 1) {
 			OrionBot::TryBuildStructureAtCP(ABILITY_ID::BUILD_BARRACKS, UNIT_TYPEID::TERRAN_SCV, RAX6_STATE.tobuildRaxs);
+			//TryBuildBarracks();
 		}
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) > 0) {
 			RAX6_STATE.upgradeOrbital = true;
@@ -67,7 +68,8 @@ void OrionBot::Rax6Build() {
 			TryBuildSupplyDepot();
 			const ObservationInterface* observation = Observation();
 			OrionBot::getNextBarrackLocation();
-			OrionBot::TryBuildStructureAtCP(ABILITY_ID::BUILD_BARRACKS, UNIT_TYPEID::TERRAN_SCV, RAX6_STATE.barracks);
+			//OrionBot::TryBuildStructureAtCP(ABILITY_ID::BUILD_BARRACKS, UNIT_TYPEID::TERRAN_SCV, RAX6_STATE.barracks);
+			TryBuildBarracks();
 			TryBuildMarine();
 		}
 		RAX6_STATE.currentBuild++;
@@ -76,6 +78,7 @@ void OrionBot::Rax6Build() {
 	case STAGE4_RAX6:
 		TryBuildSupplyDepot();
 		TryBuildBarracks();
+		RAX6_STATE.attacking = true;
 		TryBuildMarine();
 	}
 }
@@ -93,18 +96,20 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_ORBITALCOMMAND: {
+
 		if (unit->energy > 50) {
 			const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
 			if (!mineral_target) {
 				break;
 			}
-			//Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE);
-			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_SCAN, Point2D(150, 33.5));
-			std::cout << "SCANNEDDDDD" << std::endl;
+			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE);
+			//Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_SCAN, Point2D(150, 33.5));
+			
 		}
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_SCV: {
+		/*
 		const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
 		// const bool vespene_target = FindNearestVespeneGeyser(unit->pos);
 		if (!mineral_target) {
@@ -114,6 +119,27 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 			break;
 		}
 		Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
+		break;*/ 
+
+		const GameInfo& game_info = Observation()->GetGameInfo();
+
+		if (RAX6_STATE.num_units_scouting < game_info.enemy_start_locations.size()) {
+			// send csv to one of the corners and save base location to possible_enemy_bases
+			Point2D location = game_info.enemy_start_locations[RAX6_STATE.num_units_scouting];
+			Actions()->UnitCommand(unit, ABILITY_ID::MOVE_MOVE, location);
+
+			possible_enemy_bases.push_back(location);
+			enemyBaseValue.push_back(0);
+			RAX6_STATE.num_units_scouting++;
+		}
+		else {
+			const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
+			if (!mineral_target) {
+				break;
+			}
+
+			Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
+		}
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_BARRACKS: {
@@ -128,8 +154,15 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 	}
 	
 	case UNIT_TYPEID::TERRAN_MARINE: {
-		const GameInfo& game_info = Observation()->GetGameInfo();
+		/*const GameInfo& game_info = Observation()->GetGameInfo();
 		Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
+		break;*/ 
+		if (RAX6_STATE.attacking) {
+			const GameInfo& game_info = Observation()->GetGameInfo();
+			// there are 3 enemy_start_locations
+			//Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, locations_enemy_seen.front());
+			Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, FindEnemyBase());
+		}
 		break;
 	}
 
@@ -281,4 +314,72 @@ void OrionBot::getNextBarrackLocation() {
 		RAX6_STATE.barracks.x -= 2;
 		RAX6_STATE.barracks.y += 0;
 	}
+}
+
+
+
+// a
+void OrionBot::OnUnitEnterVision(const Unit* unit) {
+	if (unit->alliance == Unit::Alliance::Enemy) {
+		//std::cout << "See enemy" << std::endl;
+		locations_enemy_seen.push_back(Point2D(unit->pos));
+
+		// find to what base this location is closest to
+		closestToBase(Point2D(unit->pos));
+	}
+}
+
+void OrionBot::closestToBase(Point2D coord) {
+	float min_distance = FLT_MAX;
+	int min_i = 0;
+
+	for (int i = 0; i < possible_enemy_bases.size(); ++i) {
+		auto distance = DistanceSquared2D(coord, possible_enemy_bases[i]);
+		if (distance < min_distance) {
+			min_distance = distance;
+			min_i = i;
+		}
+	}
+	enemyBaseValue[min_i] += 1;
+	return;
+}
+
+Point2D OrionBot::FindEnemyBase() {
+	auto position = std::distance(enemyBaseValue.begin(), std::max_element(enemyBaseValue.begin(), enemyBaseValue.end()));
+	Point2D point = possible_enemy_bases[position];
+	return point;
+}
+
+
+/*
+ * Fix!
+ * ~Asma
+*/
+bool OrionBot::TryBuildMarine() {
+	//return TryBuildUnit(ABILITY_ID::TRAIN_MARINE, UNIT_TYPEID::TERRAN_BARRACKS);
+	const ObservationInterface* observation = Observation();
+	//If we are at supply cap, don't build anymore units, unless its an overlord.
+	if (observation->GetFoodUsed() >= observation->GetFoodCap() && ABILITY_ID::TRAIN_MARINE != ABILITY_ID::TRAIN_OVERLORD) {
+		return false;
+	}
+	const Unit* unit = nullptr;
+	Units my_units = observation->GetUnits(Unit::Alliance::Self);
+	for (const auto u : my_units) {
+		if (u->unit_type == UNIT_TYPEID::TERRAN_BARRACKS) {
+			unit = u;
+			if (!unit->orders.empty()) {
+				return false;
+			}
+
+			if (unit->build_progress != 1) {
+				return false;
+			}
+
+			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE, FindEnemyBase());
+			//Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, Point2D(158.5, 158.5));
+			return true;
+		}
+	}
+	return false;
+
 }

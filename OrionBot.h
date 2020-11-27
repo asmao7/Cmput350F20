@@ -39,10 +39,13 @@ private:
 	int max_worker_count_ = 70;
 	struct Rax6 {
 		Rax6() :
-			upgradeOrbital(false), newCommandCentre(false), currentBuild(0) {}
+			upgradeOrbital(false), newCommandCentre(false), currentBuild(0),
+			attacking(false), num_units_scouting(0)  {}
 		bool upgradeOrbital;
 		bool newCommandCentre;
 		int currentBuild;
+		int num_units_scouting;
+		bool attacking;
 	
 		int raxs = 0;
 		Point2D barracks;
@@ -83,6 +86,7 @@ private:
 	Banshee BANSHEE_STATE;
 	enum Banshee_Strategy { STAGE1_BANSHEE = 0, STAGE2_BANSHEE, STAGE3_BANSHEE, STAGE4_BANSHEE };
 
+	/*
 	struct Marines12 {
 		Marines12() : orbital_upgrade(false), produce_scv(true), current_build(0),
 					produce_marine(false), orbital_command_upgraded(false)
@@ -96,6 +100,30 @@ private:
 
 	Marines12 MARINES12_STATE;
 	enum Marines12_Strategy { STAGE1_MARINES = 0, STAGE2_MARINES, STAGE3_MARINES, STAGE4_ATTACK_MARINES };
+	*/
+
+	struct Marines12 {
+		Marines12() : orbital_upgrade(false), produce_scv(true), current_build(0),
+			orbital_command_upgraded(false), supplies_called(false),
+			attacking(false), num_units_scouting(0)
+		{}
+		int current_build;
+		bool orbital_upgrade;
+		bool produce_scv;
+		bool orbital_command_upgraded;
+		bool supplies_called;
+		bool attacking;
+		int num_units_scouting;
+	};
+
+	Marines12 MARINES12_STATE;
+	enum Marines12_Strategy { STAGE1_MARINES = 0, STAGE2_MARINES, STAGE3_MARINES, STAGE4_ATTACK_MARINES };
+
+	std::vector<Point2D> locations_enemy_seen;
+
+	std::vector<Point2D> possible_enemy_bases;
+	std::vector<int> enemyBaseValue;
+
 	#include "BuildManager.h"
 	#include "Banshee.h"
 	#include "Rax6.h"

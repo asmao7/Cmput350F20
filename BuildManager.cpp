@@ -103,6 +103,7 @@ bool OrionBot::AddWorkersToRefineries(const Unit* unit) {
  * Fix!
  * ~Asma
 */
+/*
 bool OrionBot::TryBuildMarine() {
     //return TryBuildUnit(ABILITY_ID::TRAIN_MARINE, UNIT_TYPEID::TERRAN_BARRACKS);
     const ObservationInterface* observation = Observation();
@@ -123,14 +124,14 @@ bool OrionBot::TryBuildMarine() {
                 return false;
             }
 
-            Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE, Point2D(158.5, 158.5));
+            Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE, FindEnemyBase());
             //Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, Point2D(158.5, 158.5));
             return true;
         }
     }
     return false;
    
-}
+}*/
 
 /* 
  * TODO! 
