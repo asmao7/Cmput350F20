@@ -68,6 +68,16 @@ bool OrionBot::TryBuildFactory() {
 bool OrionBot::TryBuildStarport() {
     return OrionBot::TryBuildStructure(ABILITY_ID::BUILD_STARPORT);
 }
+//Try to build engineering bay
+//Made by: Joe
+bool OrionBot::TryBuildEngineeringBay() {
+    return OrionBot::TryBuildStructure(ABILITY_ID::BUILD_ENGINEERINGBAY);
+}
+//Try to build ghost academy
+//Made by: Joe
+bool OrionBot::TryBuildGhostAcademy() {
+    return OrionBot::TryBuildStructure(ABILITY_ID::BUILD_GHOSTACADEMY);
+}
 
 
 // Made by Ana

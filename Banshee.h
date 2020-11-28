@@ -164,10 +164,10 @@ void OrionBot::BansheeBuild() {
 				OrionBot::TryBuildSupplyDepot();
 			}*/
 			BANSHEE_STATE.morph_reactor = true;
-			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) < 2) {
+			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) < 3) {
 				OrionBot::TryBuildFactory();
 			}
-			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) >= 1) {
+			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) >= 0) {
 				BANSHEE_STATE.morph_techlab = true;
 			}
 			/*if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_COMMANDCENTER) < 1) {
@@ -177,6 +177,11 @@ void OrionBot::BansheeBuild() {
 				//OrionBot::TryBuildSupplyDepot();
 				BANSHEE_STATE.morph_reactor = false;
 				BANSHEE_STATE.morph_techlab = false;
+				/*const ObservationInterface* observation = Observation();
+				Units supply_depots = observation->GetUnits(Unit::Self, IsUnit(UNIT_TYPEID::TERRAN_SUPPLYDEPOT));
+				for (const auto& supply_depot : supply_depots) {
+					Actions()->UnitCommand(supply_depot, ABILITY_ID::MORPH_SUPPLYDEPOT_LOWER);
+				}*/
 				BANSHEE_STATE.current_build++;
 			}
 			break;
@@ -304,11 +309,12 @@ void OrionBot::BansheeOnUnitIdle(const Unit* unit) {
 	case UNIT_TYPEID::TERRAN_FACTORY: {
 		if (BANSHEE_STATE.produce_hellion) {
 			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_HELLION);
-		}
-		if (BANSHEE_STATE.morph_techlab) {
+		}else if (BANSHEE_STATE.morph_techlab) {
 			Actions()->UnitCommand(unit, ABILITY_ID::BUILD_TECHLAB_FACTORY);
 		}
-		Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SIEGETANK);
+		else {
+			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SIEGETANK);
+		}
 		/*if (BANSHEE_STATE.current_build >= STAGE4_BANSHEE) {
 			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SIEGETANK);
 		}*/
@@ -374,10 +380,33 @@ void OrionBot::BansheeOnUnitIdle(const Unit* unit) {
 				Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, OrionBot::FindEnemyBase());
 			}
 		}
+		else {
+			Actions()->UnitCommand(unit, ABILITY_ID::MORPH_SIEGEMODE);
+		}
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_SIEGETANKSIEGED: {
-		Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, OrionBot::FindEnemyBase());
+		if (BANSHEE_STATE.current_build >= STAGE4_BANSHEE) {
+			const ObservationInterface* observation = Observation();
+			Units enemy_units = observation->GetUnits(Unit::Alliance::Enemy);
+			float distance = std::numeric_limits<float>::max();
+			for (const auto& u : enemy_units) {
+				float d = Distance2D(u->pos, unit->pos);
+				if (d < distance) {
+					distance = d;
+				}
+			}
+			if (distance > 13) {
+				Actions()->UnitCommand(unit, ABILITY_ID::MORPH_UNSIEGE);
+			}
+			else {
+				Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, OrionBot::FindEnemyBase());
+			}
+		}
+		else {
+			Actions()->UnitCommand(unit, ABILITY_ID::MORPH_UNSIEGE);
+		}
+		//Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, OrionBot::FindEnemyBase());
 		break;
 	}
 	default: {
