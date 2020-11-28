@@ -50,7 +50,7 @@ void OrionBot::Rax6Build() {
 		}
 
 		if (CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) > 0) {
-			RAX6_STATE.upgradeOrbital = false;
+			RAX6_STATE.upgradeOrbital = true;
 			//RAX6_STATE.newCommandCentre = true;
 			RAX6_STATE.currentBuild++;
 		}
