@@ -27,8 +27,8 @@ private:
 	const Unit* FindNearestMineralPatch(const Point2D& start);
 	bool TryBuildSupplyDepot();
 	bool TryBuildBarracks();
-	//NEW ADDED
-	bool TryBuildStructureLocation(AbilityID ability_type_for_structure, UnitTypeID unit_type, Point2D location, bool isExpansion = false);
+	//ADDED
+	//bool TryBuildStructureLocation(AbilityID ability_type_for_structure, UnitTypeID unit_type, Point2D location, bool isExpansion);
 
 	//Global State Tracker
 	//Lets us know what strategy we are playing
