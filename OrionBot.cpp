@@ -40,6 +40,7 @@ void OrionBot::OnUnitIdle(const Unit* unit) {
             break;
         }
         case RUSH_FINAL: {
+            OrionBot::CombinedOnUnitIdle(unit);
             break;
         }
     }
