@@ -28,7 +28,7 @@ private:
 	bool TryBuildSupplyDepot();
 	bool TryBuildBarracks();
 	//ADDED
-	//bool TryBuildStructureLocation(AbilityID ability_type_for_structure, UnitTypeID unit_type, Point2D location, bool isExpansion);
+	bool OrionBot::TryBuildStructureTest(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type)
 
 	//Global State Tracker
 	//Lets us know what strategy we are playing
