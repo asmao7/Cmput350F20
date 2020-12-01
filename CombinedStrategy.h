@@ -54,6 +54,96 @@ void OrionBot::CombinedBuild() {
 	}
 }
 
+void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
+	switch (unit->unit_type.ToType()) {
+	case UNIT_TYPEID::TERRAN_COMMANDCENTER: {
+		if (FINALSTRATEGY_STATE.upgradeOrbital) {
+			Actions()->UnitCommand(unit, ABILITY_ID::MORPH_ORBITALCOMMAND);
+		}
+		else {
+			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
+		}
+
+		break;
+	}
+	case UNIT_TYPEID::TERRAN_ORBITALCOMMAND: {
+		if (unit->energy > 50) {
+			const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
+			if (!mineral_target) {
+				break;
+			}
+			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE, mineral_target);
+		}
+		else {
+			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
+		}
+		break;
+	}
+	case UNIT_TYPEID::TERRAN_SCV: {
+		const GameInfo& game_info = Observation()->GetGameInfo();
+
+		if (FINALSTRATEGY_STATE.num_units_scouting < game_info.enemy_start_locations.size()) {
+			// send csv to one of the corners and save base location to possible_enemy_bases
+			Point2D location = game_info.enemy_start_locations[FINALSTRATEGY_STATE.num_units_scouting];
+			Actions()->UnitCommand(unit, ABILITY_ID::MOVE_MOVE, location);
+
+			possible_enemy_bases.push_back(location);
+			enemyBaseValue.push_back(0);
+			FINALSTRATEGY_STATE.num_units_scouting++;
+
+			if (FINALSTRATEGY_STATE.expand) {
+				Point2D enemyPos = FindEnemyBase();
+				for (int i = 0; i < 3; i++) {
+					if ((possible_enemy_bases[i]) != enemyPos) {
+						TryBuildStructureAtCP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV, possible_enemy_bases[i]);
+					}
+				}
+			}
+			const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
+			if (!mineral_target) {
+				break;
+			}
+			Actions()->UnitCommand(unit, ABILITY_ID::SMART, mineral_target);
+			break;
+
+		}
+	}
+
+	case UNIT_TYPEID::TERRAN_BARRACKS: {
+		Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_MARINE);
+		break;
+	}
+
+	case UNIT_TYPEID::TERRAN_MARINE: {
+		if (CountUnitType(UNIT_TYPEID::TERRAN_MARINE) > 50) {
+			FINALSTRATEGY_STATE.attacking = true;
+		}
+		if (FINALSTRATEGY_STATE.attacking) {
+			const GameInfo& game_info = Observation()->GetGameInfo();
+			// there are 3 enemy_start_locations
+			//Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, locations_enemy_seen.front());
+			Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, FindEnemyBase());
+		}
+		else {
+			Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, FINALSTRATEGY_STATE.tobuildRaxs);
+		}
+		break;
+	}
+
+	case UNIT_TYPEID::TERRAN_REAPER: {
+		const GameInfo& game_info = Observation()->GetGameInfo();
+		Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
+		break;
+	}
+
+	default: {
+		break;
+	}
+	}
+
+}
+
+
 
 /*
  * Set the positions of chike points for SD and rax
