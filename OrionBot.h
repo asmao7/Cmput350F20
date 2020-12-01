@@ -32,8 +32,8 @@ private:
 	//Lets us know what strategy we are playing
 	enum RushStrategy { RUSH_BANSHEE = 0, RUSH_12MARINES, RUSH_6RAX };
 	//int RUSH_STRATEGY = RUSH_BANSHEE;
-	int RUSH_STRATEGY = RUSH_6RAX;
-	//int RUSH_STRATEGY = RUSH_12MARINES;
+	//int RUSH_STRATEGY = RUSH_6RAX;
+	int RUSH_STRATEGY = RUSH_12MARINES;
 
 	//6Rax Rush Strategy Variables
 	//Made by: Asma
@@ -90,7 +90,7 @@ private:
 	struct Marines12 {
 		Marines12() : orbital_upgrade(false), produce_scv(true), current_build(0),
 			orbital_command_upgraded(false), supplies_called(false),
-			attacking(false), num_units_scouting(0)
+			attacking(false), num_units_scouting(0), i_location(0)
 		{}
 		int current_build;
 		bool orbital_upgrade;
@@ -99,6 +99,7 @@ private:
 		bool supplies_called;
 		bool attacking;
 		int num_units_scouting;
+		int i_location;
 	};
 
 	Marines12 MARINES12_STATE;
