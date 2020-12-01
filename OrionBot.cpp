@@ -93,7 +93,7 @@ bool OrionBot::TryBuildStructure(ABILITY_ID ability_type_for_structure, UNIT_TYP
             distance = d;
         }
     }
-    if (distance < 5) {
+    if (distance < 5.5) {
         return false;
     }
 

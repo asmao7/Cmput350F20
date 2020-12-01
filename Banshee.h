@@ -192,10 +192,13 @@ void OrionBot::BansheeBuild() {
 			//39 Supply Depot
 		std::cout << STAGE4_BANSHEE << std::endl;
 		if (Observation()->GetMinerals() >= 100) {
-			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SUPPLYDEPOT) < 6) {
+			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SUPPLYDEPOT) < 7) {
 				//OrionBot::TryBuildSupplyDepot();
 				OrionBot::TryBuildSupplyDepot();
 			}
+		}
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_COMMANDCENTER) < 2) {
+			OrionBot::TryBuildBarracks();
 		}
 		//39 Siege Tanks
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SUPPLYDEPOT) > 0) {
@@ -206,7 +209,7 @@ void OrionBot::BansheeBuild() {
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) < 1) {
 			OrionBot::TryBuildCommandCentre();
 		}
-		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANK) + OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANKSIEGED) > 8) {
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANK) + OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANKSIEGED) > 5) {
 			BANSHEE_STATE.current_build++;
 		}
 		break;
