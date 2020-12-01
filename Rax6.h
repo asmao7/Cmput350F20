@@ -95,6 +95,11 @@ void OrionBot::Rax6Build() {
 		}
 		break;
 
+	case STAGE5_RAX6:
+		TryBuildSupplyDepot();
+		TryBuildBarracks();
+		TryBuildBarracks();
+		break;
 	}
 }
 
@@ -124,6 +129,7 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 		}
 		break;
 	}
+	
 	case UNIT_TYPEID::TERRAN_SCV: {
 		const GameInfo& game_info = Observation()->GetGameInfo();
 		/*
@@ -143,6 +149,7 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 					TryBuildStructureAtCP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV, possible_enemy_bases[i]);
 				}
 			}
+			TryBuildStructureAtCP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV, Point2D(Observation()->GetStartLocation().x, Observation()->GetStartLocation().y));
 		}
 		const Unit* mineral_target = FindNearestMineralPatch(unit->pos);
 		if (!mineral_target) {
@@ -159,7 +166,7 @@ void OrionBot::Rax6OnUnitIdle(const Unit* unit) {
 	}
 
 	case UNIT_TYPEID::TERRAN_MARINE: {
-		if (CountUnitType(UNIT_TYPEID::TERRAN_MARINE) > 50) {
+		if (CountUnitType(UNIT_TYPEID::TERRAN_MARINE) >= 50) {
 			RAX6_STATE.attacking = true;
 		}
 		if (RAX6_STATE.attacking) {
