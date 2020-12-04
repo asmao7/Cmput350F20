@@ -117,6 +117,8 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 						}
 					}
 				}
+				TryBuildStructureAtCP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV, Point2D(Observation()->GetStartLocation().x, Observation()->GetStartLocation().y));
+
 				if (AddWorkersToRefineries(unit)) {
 					break;
 				}
