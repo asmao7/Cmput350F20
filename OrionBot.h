@@ -41,33 +41,22 @@ private:
 	/*  
 	 * FINAL STRATEGY VARIABLES
 	*/
-	struct finalStrategy {
-		finalStrategy() :
-			upgradeOrbital(false), newCommandCentre(false), currentBuild(0),
-			expand(false), attacking(false), num_units_scouting(0), morph_techlab(false), produce_banshee(false) {}
-		bool upgradeOrbital;
-		bool newCommandCentre;
-		int currentBuild;
-		bool morph_techlab;
+	struct FinalStrategy {
+		FinalStrategy() :
+			orbital_upgrade(false), produce_hellion(false), produce_banshee(false),
+			morph_techlab(false), morph_reactor(false), current_build(0), num_units_scouting(0)
+		{
+		}
+		bool orbital_upgrade;
+		bool produce_hellion;
 		bool produce_banshee;
-		//bool produce_tank;
-		bool expand;
+		bool morph_techlab;
+		bool morph_reactor;
+		int current_build;
 		int num_units_scouting;
-		bool attacking;
-
-		int raxs = 0;
-		Point2D barracks;
-
-		Point2D tobuildSD;
-		Point2D tobuildRaxs;
-
-		Point2D BOTTOM_LEFT = Point2D(33.5, 33.5);
-		Point2D BOTTOM_RIGHT = Point2D(158.5, 33.5);
-		Point2D TOP_LEFT = Point2D(33.5, 158.5);
-		Point2D TOP_RIGHT = Point2D(158.5, 158.5);
 	};
-	finalStrategy FINALSTRATEGY_STATE;
-	enum final_Strategy { STAGE1_FINALSTRATEGY = 0, STAGE2_FINALSTRATEGY, STAGE3_FINALSTRATEGY, STAGE4_FINALSTRATEGY, STAGE5_FINALSTRATEGY};
+	FinalStrategy FINALSTRATEGY_STATE;
+	enum Final_Strategy { STAGE1_FINALSTRATEGY = 0, STAGE2_FINALSTRATEGY, STAGE3_FINALSTRATEGY, STAGE4_FINALSTRATEGY, STAGE5_FINALSTRATEGY};
 
 
 	
