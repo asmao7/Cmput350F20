@@ -102,7 +102,7 @@ bool OrionBot::TryBuildStructure(ABILITY_ID ability_type_for_structure, UNIT_TYP
     }
     float rx = GetRandomScalar();
     float ry = GetRandomScalar();
-    Point2D build_location = Point2D(bases.front()->pos.x + rx * 15, bases.front()->pos.y + ry * 15);
+    Point2D build_location = Point2D(bases.front()->pos.x + rx * 14, bases.front()->pos.y + ry * 14);
 
     Units units = observation->GetUnits(Unit::Alliance::Self);
     float distance = std::numeric_limits<float>::max();
@@ -157,11 +157,10 @@ bool OrionBot::TryBuildStructure(ABILITY_ID ability_type_for_structure, UNIT_TYP
 bool OrionBot::TryBuildSupplyDepot() {
     const ObservationInterface* observation = Observation();
 
-    /*
+   
     // If we are not supply capped, don't build a supply depot.
     if (observation->GetFoodUsed() <= observation->GetFoodCap() - 2)
         return false;
-    */
 
     // Try and build a depot. Find a random SCV and give it the order.
     return TryBuildStructure(ABILITY_ID::BUILD_SUPPLYDEPOT);
