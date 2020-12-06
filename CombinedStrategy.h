@@ -23,6 +23,7 @@ void OrionBot::CombinedBuild() {
 				OrionBot::TryBuildFactory();
 			}
 		}
+		
 		// Increment the build counter.
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_REFINERY) > 0) {
 			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) > 0) {
@@ -150,6 +151,11 @@ void OrionBot::CombinedBuild() {
 		else {
 			FINALSTRATEGY_STATE.produce_banshee = false;
 		}
+		
+		// try expand at the expansion point
+		if (FINALSTRATEGY_STATE.newCommandCentre == false) {
+			TryBuildCommandCentreExpansion(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV);
+		}
 
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANK) + OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANKSIEGED) > 6) {
 			FINALSTRATEGY_STATE.current_build++;
@@ -223,6 +229,16 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 	}
 	case UNIT_TYPEID::TERRAN_SCV: {
 		const GameInfo& game_info = Observation()->GetGameInfo();
+
+		if (FINALSTRATEGY_STATE.expand) {
+			Point2D enemyPos = FindEnemyBase();
+			for (int i = 0; i < 3; i++) {
+				if ((possible_enemy_bases[i]) != enemyPos) {
+					TryBuildStructureAtCP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV, possible_enemy_bases[i]);
+				}
+			}
+			TryBuildStructureAtCP(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV, Point2D(Observation()->GetStartLocation().x, Observation()->GetStartLocation().y));
+		}
 
 		if (FINALSTRATEGY_STATE.num_units_scouting < game_info.enemy_start_locations.size()) {
 			// send csv to one of the corners and save base location to possible_enemy_bases
