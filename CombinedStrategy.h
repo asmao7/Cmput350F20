@@ -37,6 +37,7 @@ void OrionBot::CombinedBuild() {
 			20 - Starport + Hellion(1 only)
 			@100 % Hellion(1) - Tech Lab(1) > Banshees(to 2)
 			23 - Refinery(2) + Supply Depot*/
+		// new 
 		FINALSTRATEGY_STATE.expand = true;
 		FINALSTRATEGY_STATE.orbital_upgrade = false;
 		//16 - Supply Depot
