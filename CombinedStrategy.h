@@ -169,6 +169,7 @@ void OrionBot::CombinedBuild() {
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_COMMANDCENTER) > 0) {
 			OrionBot::TryBuildBarracks();
 		}
+		OrionBot::TryBuildFactory();
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BANSHEE) < 3) {
 			FINALSTRATEGY_STATE.produce_banshee = true;
 		}
@@ -208,18 +209,23 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 			if (!mineral_target) {
 				break;
 			}
-			if (FINALSTRATEGY_STATE.current_build < STAGE3_FINALSTRATEGY) {
+			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE, mineral_target);
+			/*if (FINALSTRATEGY_STATE.current_build < STAGE3_FINALSTRATEGY) {
 				Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE, mineral_target);
 			}
 			else {
 				OrionBot::tryCalldownExtraSupplies(unit);
-			}	
+			}	*/
 		}
 		else {
 			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
 		}
 		break;
 	}
+	/*case UNIT_TYPEID::TERRAN_SUPPLYDEPOT: {
+		Actions()->UnitCommand(unit, ABILITY_ID::MORPH_SUPPLYDEPOT_LOWER);
+		break;
+	}*/
 	case UNIT_TYPEID::TERRAN_SCV: {
 		const GameInfo& game_info = Observation()->GetGameInfo();
 
@@ -278,6 +284,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_THOR) < 1) {
 				Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_THOR);
 			}
+			Actions()->UnitCommand(unit, ABILITY_ID::BUILD_TECHLAB_FACTORY);
 		}
 		break;
 	}

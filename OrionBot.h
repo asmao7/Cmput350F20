@@ -28,7 +28,7 @@ private:
 	bool TryBuildSupplyDepot();
 	bool TryBuildBarracks();
 	//ADDED
-	//bool OrionBot::TryBuildStructureTest(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type);
+	bool TryBuildStructureRandom(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type = UNIT_TYPEID::TERRAN_SCV);
 
 	//Global State Tracker
 	//Lets us know what strategy we are playing
