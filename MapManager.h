@@ -1,5 +1,11 @@
 #include "OrionBot.h"
 
+/*
+ * Find the map we are playing on to determine whether to expand to 
+ * the corners or no and to find the choke points accordingly for
+ * defense.
+*/
+
 void OrionBot::FindMap() {
 	enum class Maps { CactusValleyLE, BelShirVestigeLE, ProximaStationLE };
 
