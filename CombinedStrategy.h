@@ -37,6 +37,8 @@ void OrionBot::CombinedBuild() {
 			20 - Starport + Hellion(1 only)
 			@100 % Hellion(1) - Tech Lab(1) > Banshees(to 2)
 			23 - Refinery(2) + Supply Depot*/
+		// new 
+		FINALSTRATEGY_STATE.expand = true;
 		FINALSTRATEGY_STATE.orbital_upgrade = false;
 		//16 - Supply Depot
 		OrionBot::TryBuildSupplyDepot();
@@ -145,7 +147,6 @@ void OrionBot::CombinedBuild() {
 		}
 		
 		// try expand at the expansion point
-		FINALSTRATEGY_STATE.expand = true;
 		if (FINALSTRATEGY_STATE.newCommandCentre == false) {
 			TryBuildCommandCentreExpansion(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV);
 		}
