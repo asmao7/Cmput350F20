@@ -73,9 +73,9 @@ void OrionBot::CombinedBuild() {
 		OrionBot::BuildRefinery();
 		OrionBot::FillRefineries();
 
-		/*if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) < 2) {
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) < 2) {
 			OrionBot::TryBuildFactory();
-		}*/
+		}
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) < 1) {
 			OrionBot::TryBuildCommandCentre();
 		}
@@ -104,9 +104,6 @@ void OrionBot::CombinedBuild() {
 		std::cout << STAGE3_FINALSTRATEGY << std::endl;
 		OrionBot::TryBuildSupplyDepot();
 		FINALSTRATEGY_STATE.morph_reactor = true;
-		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_STARPORT) < 1 || OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) < 1) {
-			FINALSTRATEGY_STATE.current_build = STAGE2_BANSHEE;
-		}
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) >= 0) {
 			FINALSTRATEGY_STATE.morph_techlab = true;
 		}
@@ -119,15 +116,13 @@ void OrionBot::CombinedBuild() {
 		else {
 			FINALSTRATEGY_STATE.produce_banshee = false;
 		}
-		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKSREACTOR) > 0) {
-			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORYTECHLAB) >= 1) {
-				FINALSTRATEGY_STATE.morph_reactor = false;
-				FINALSTRATEGY_STATE.morph_techlab = false;
-				FINALSTRATEGY_STATE.current_build++;
-			}
-			else {
-				OrionBot::TryBuildFactory();
-			}
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORYTECHLAB) >= 1) {
+			FINALSTRATEGY_STATE.morph_reactor = false;
+			FINALSTRATEGY_STATE.morph_techlab = false;
+			FINALSTRATEGY_STATE.current_build++;
+		}
+		else {
+			OrionBot::TryBuildFactory();
 		}
 		break;
 	}
@@ -156,7 +151,7 @@ void OrionBot::CombinedBuild() {
 			TryBuildCommandCentreExpansion(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV);
 		}
 
-		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANK) + OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANKSIEGED) > 6) {
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANK) + OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANKSIEGED) > 5) {
 			FINALSTRATEGY_STATE.current_build++;
 		}
 		break;
@@ -220,7 +215,9 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_SUPPLYDEPOT: {
-		Actions()->UnitCommand(unit, ABILITY_ID::MORPH_SUPPLYDEPOT_LOWER);
+		if (FINALSTRATEGY_STATE.current_build >= STAGE4_BANSHEE) {
+			Actions()->UnitCommand(unit, ABILITY_ID::MORPH_SUPPLYDEPOT_LOWER);
+		}
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_SCV: {
