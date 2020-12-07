@@ -68,6 +68,11 @@ bool OrionBot::TryBuildStructureRandom(ABILITY_ID ability_type_for_structure, UN
             if (order.ability_id == ability_type_for_structure) {
                 return false;
             }
+            if (FINALSTRATEGY_STATE.current_build < STAGE2_FINALSTRATEGY) {
+                if (order.ability_id == ABILITY_ID::MOVE_MOVE) {
+                    return false;
+                }
+            }
         }
 
         if (unit->unit_type == unit_type) {
@@ -132,6 +137,11 @@ bool OrionBot::TryBuildStructure(ABILITY_ID ability_type_for_structure, UNIT_TYP
         for (const auto& order : worker->orders) {
             if (order.ability_id == ability_type_for_structure) {
                 return false;
+            }
+            if (FINALSTRATEGY_STATE.current_build < STAGE2_FINALSTRATEGY) {
+                if (order.ability_id == ABILITY_ID::MOVE_MOVE) {
+                    return false;
+                }
             }
         }
     }

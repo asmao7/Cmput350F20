@@ -45,7 +45,7 @@ private:
 	struct FinalStrategy {
 		FinalStrategy() :
 			orbital_upgrade(false), produce_hellion(false), produce_banshee(false),
-			morph_techlab(false), morph_reactor(false), current_build(0), num_units_scouting(0)
+			morph_techlab(false), morph_reactor(false), current_build(0), num_units_scouting(0), scouting(true)
 		{
 		}
 		bool orbital_upgrade;
@@ -53,6 +53,7 @@ private:
 		bool produce_banshee;
 		bool morph_techlab;
 		bool morph_reactor;
+		bool scouting;
 		int current_build;
 		int num_units_scouting;
 		bool newCommandCentre = false;

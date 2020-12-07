@@ -3,8 +3,9 @@
 void OrionBot::CombinedBuild() {
 	switch (FINALSTRATEGY_STATE.current_build) {
 	case STAGE1_FINALSTRATEGY: {
-		OrionBot::scout();
-
+		if (FINALSTRATEGY_STATE.scouting) {
+			OrionBot::FinalScout();
+		}
 		// 10 - Supply Depot
 		OrionBot::TryBuildSupplyDepot();
 		// 12 - Refinery
@@ -172,7 +173,7 @@ void OrionBot::CombinedBuild() {
 		OrionBot::BuildRefinery();
 		OrionBot::FillRefineries();
 
-		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) < 3) {
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) < 4) {
 			OrionBot::TryBuildBarracks();
 		}
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) < 3) {
@@ -315,6 +316,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 		//Actions()->UnitCommand(unit, ABILITY_ID::ATTACK_ATTACK, game_info.enemy_start_locations.front());
 		if (FINALSTRATEGY_STATE.current_build >= STAGE5_FINALSTRATEGY) {
 			//next = true;
+			Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, current_location);
 			Point2D pos = unit->pos;
 			if (pos == current_location) {
 				next = true;
@@ -328,6 +330,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 	case UNIT_TYPEID::TERRAN_HELLION: {
 		if (FINALSTRATEGY_STATE.current_build >= STAGE5_FINALSTRATEGY) {
 			//next = true;
+			Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, current_location);
 			Point2D pos = unit->pos;
 			if (pos == current_location) {
 				next = true;
@@ -341,6 +344,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 	case UNIT_TYPEID::TERRAN_BANSHEE: {
 		if (FINALSTRATEGY_STATE.current_build >= STAGE5_FINALSTRATEGY) {
 			//next = true;
+			Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, current_location);
 			Point2D pos = unit->pos;
 			if (pos == current_location) {
 				next = true;
@@ -363,6 +367,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 		if (FINALSTRATEGY_STATE.current_build >= STAGE5_FINALSTRATEGY) {
 			//Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, enemy_units.front()->pos);
 			//next = true;
+			Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, current_location);
 			Point2D pos = unit->pos;
 			if (pos == current_location) {
 				next = true;
@@ -389,6 +394,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 			}
 			else {
 				//next = true;
+				Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, current_location);
 				Point2D pos = unit->pos;
 				if (pos == current_location) {
 					next = true;
@@ -417,6 +423,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 			}
 			else {
 				//next = true;
+				Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, current_location);
 				Point2D pos = unit->pos;
 				if (pos == current_location) {
 					next = true;
@@ -459,7 +466,7 @@ void OrionBot::final_attack() {
 		//wait = false;
 	}
 	current_location = locations_enemy_seen2.front();
-	for (const auto& base : bases) {
+	/*for (const auto& base : bases) {
 		if (base->unit_type == UNIT_TYPEID::TERRAN_MARINE 
 			|| base->unit_type == UNIT_TYPEID::TERRAN_SIEGETANKSIEGED
 			|| base->unit_type == UNIT_TYPEID::TERRAN_SIEGETANK
@@ -469,10 +476,41 @@ void OrionBot::final_attack() {
 
 			Actions()->UnitCommand(base, ABILITY_ID::ATTACK, current_location);
 		}
-	}
+	}*/
 	if (next) {
-		locations_enemy_seen2.pop();
-		next = false;
+		if (!locations_enemy_seen2.empty()) {
+			locations_enemy_seen2.pop();
+			next = false;
+		}
 	}
 	//next = false;
+}
+
+void OrionBot::FinalScout() {
+	const ObservationInterface* observation = Observation();
+	Units bases = observation->GetUnits();
+	const GameInfo& game_info = Observation()->GetGameInfo();
+
+	base_location = Observation()->GetStartLocation();
+	if (!found_locations) {
+		expansion_locations = search::CalculateExpansionLocations(Observation(), Query());
+		found_locations = true;
+	}
+
+	for (const auto& base : bases) {
+		if (base->unit_type == UNIT_TYPEID::TERRAN_SCV) {
+			if (FINALSTRATEGY_STATE.num_units_scouting < game_info.enemy_start_locations.size()) {
+				// send csv to one of the corners and save base location to possible_enemy_bases
+				Point2D location = game_info.enemy_start_locations[FINALSTRATEGY_STATE.num_units_scouting];
+				Actions()->UnitCommand(base, ABILITY_ID::MOVE_MOVE, location);
+
+				possible_enemy_bases.push_back(location);
+				enemyBaseValue.push_back(0);
+				FINALSTRATEGY_STATE.num_units_scouting++;
+			}
+			else {
+				FINALSTRATEGY_STATE.scouting = false;
+			}
+		}
+	}
 }
