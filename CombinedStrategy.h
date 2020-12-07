@@ -38,7 +38,7 @@ void OrionBot::CombinedBuild() {
 			@100 % Hellion(1) - Tech Lab(1) > Banshees(to 2)
 			23 - Refinery(2) + Supply Depot*/
 		
-		FINALSTRATEGY_STATE.orbital_upgrade = false;
+		FINALSTRATEGY_STATE.orbital_upgrade = true;
 		//16 - Supply Depot
 		OrionBot::TryBuildSupplyDepot();
 		//16 - Marine(1) 
