@@ -28,7 +28,6 @@ private:
 	const Unit* FindNearestMineralPatch(const Point2D& start);
 	bool TryBuildSupplyDepot();
 	bool TryBuildBarracks();
-	//ADDED
 	bool TryBuildStructureRandom(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type = UNIT_TYPEID::TERRAN_SCV);
 
 	//Global State Tracker
@@ -75,7 +74,6 @@ private:
 	
 
 	//6Rax Rush Strategy Variables
-	//Made by: Asma
 	int max_worker_count_ = 70;
 	struct Rax6 {
 		Rax6() :
@@ -106,7 +104,6 @@ private:
 	
 
 	//Banshee Rush Strategy Variables
-	//Made by: Joe
 	struct Banshee {
 		Banshee() :
 			orbital_upgrade(false), produce_hellion(false), produce_banshee(false), 
@@ -126,7 +123,6 @@ private:
 
 
 	//12 Marines Rush Strategy Variables
-
 	struct Marines12 {
 		Marines12() : orbital_upgrade(false), produce_scv(true), current_build(0),
 			orbital_command_upgraded(false), supplies_called(false),
@@ -160,7 +156,6 @@ private:
 
 	Point2D current_location;
 
-	//std::map<Point2D, int> possible_enemy_bases;
 	#include "BuildManager.h"
 	#include "Banshee.h"
 	#include "Rax6.h"
