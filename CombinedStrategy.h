@@ -7,7 +7,6 @@ void OrionBot::CombinedBuild() {
 			OrionBot::FinalScout();
 		}
 		// 10 - Supply Depot
-		//OrionBot::scout();
 		OrionBot::TryBuildSupplyDepot();
 		// 12 - Refinery
 		OrionBot::BuildRefinery();
@@ -103,7 +102,6 @@ void OrionBot::CombinedBuild() {
 		//30 - Barracks > Reactor + Supply Depot
 			//32 - Factory > Tech Lab(2)
 			//Supply Depot
-		std::cout << STAGE3_FINALSTRATEGY << std::endl;
 		OrionBot::TryBuildSupplyDepot();
 		FINALSTRATEGY_STATE.morph_reactor = true;
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) >= 0) {
@@ -132,7 +130,6 @@ void OrionBot::CombinedBuild() {
 		//39 - Siege Tanks + Supply Depot
 			//52 - Siege Tech > @100 % -Attack
 			//39 Supply Depot
-		std::cout << STAGE4_FINALSTRATEGY << std::endl;
 		OrionBot::TryBuildSupplyDepot();
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) < 2) {
 			OrionBot::TryBuildBarracks();
@@ -163,7 +160,6 @@ void OrionBot::CombinedBuild() {
 		break;
 	}
 	case STAGE5_FINALSTRATEGY: {
-		std::cout << STAGE5_FINALSTRATEGY << std::endl;
 		//BANSHEE_STATE.morph_techlab = true;
 		OrionBot::final_attack();
 		//OrionBot::TryBuildCommandCentre();
@@ -481,12 +477,10 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 
 void OrionBot::final_attack() {
 	// Send all units to fight
-	//std::cout << "attack" << std::endl;
 	const ObservationInterface* observation = Observation();
 	Units bases = observation->GetUnits();
 
 	if (locations_enemy_seen2.empty()) {
-		std::cout << "stuck" << std::endl;
 		//wait = true;
 		for (int i = 0; i < expansion_locations.size(); ++i) {
 			locations_enemy_seen2.push(expansion_locations[i]);
