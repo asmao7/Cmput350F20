@@ -11,8 +11,8 @@
 	- Base expansion ~DONE!
 	STAGE3
 	- Perform a scan sweep on the corners until   ~ done but need to find a way to notify the bot about the scan
-	  the enemy base is found
-	- send all the marines there		~ sendng to random cornor for now
+	  the enemy base is found			~DONE
+	- send all the marines there		~ Done
 	STAGE4
 	- more barracks to train marines for attacking		  ~done
 	- build the barracks in a line to shield the CC
@@ -174,7 +174,6 @@ bool OrionBot::TryBuildCommandCentreExpansion(ABILITY_ID ability_type_for_struct
 
 	const ObservationInterface* observation = Observation();
 	Point3D startLocation_ = Observation()->GetStartLocation();
-	std::cout << "STARTING POS: " << startLocation_.x << "," << startLocation_.y << std::endl;
 	Point3D staging_location_ = startLocation_;
 	std::vector<Point3D> expansions_ = search::CalculateExpansionLocations(Observation(), Query());
 	Point2D closest_expansion;
@@ -209,10 +208,8 @@ bool OrionBot::TryBuildCommandCentreExpansion(ABILITY_ID ability_type_for_struct
 	}
 
 	Point2D toBuildCC = closest_expansion;
-	//FINALSTRATEGY_STATE.wait_location = toBuildCC;
 	float rx = toBuildCC.x;
 	float ry = toBuildCC.y;
-	std::cout << "expansion point: " << toBuildCC.x << ", " << toBuildCC.y << std::endl;
 
 	Actions()->UnitCommand(unit_to_build,
 		ability_type_for_structure,
@@ -273,17 +270,17 @@ void OrionBot::setChokePoints() {
 
 	if (observation->GetStartLocation().x == RAX6_STATE.BOTTOM_LEFT.x && observation->GetStartLocation().y == RAX6_STATE.BOTTOM_LEFT.y) {
 		RAX6_STATE.tobuildSD = Point2D(29, 54);
-		RAX6_STATE.tobuildRaxs = Point2D(29, 51);	//Point2D(30, 51);
+		RAX6_STATE.tobuildRaxs = Point2D(29, 51);	
 		RAX6_STATE.barracks = Point2D(29, 43.5);
 	}
 	else if (observation->GetStartLocation().x == RAX6_STATE.BOTTOM_RIGHT.x && observation->GetStartLocation().y == RAX6_STATE.BOTTOM_RIGHT.y) {
 		RAX6_STATE.tobuildSD = Point2D(138, 29);
-		RAX6_STATE.tobuildRaxs = Point2D(140, 29);		//Point2D(140, 30);
+		RAX6_STATE.tobuildRaxs = Point2D(140, 29);		
 		RAX6_STATE.barracks = Point2D(148, 29);
 	}
 	else if (observation->GetStartLocation().x == RAX6_STATE.TOP_LEFT.x && observation->GetStartLocation().y == RAX6_STATE.TOP_LEFT.y) {
 		RAX6_STATE.tobuildSD = Point2D(51, 160);
-		RAX6_STATE.tobuildRaxs = Point2D(51, 162);		//Point2D(52, 162);
+		RAX6_STATE.tobuildRaxs = Point2D(51, 162);		
 		RAX6_STATE.barracks = Point2D(148, 160);
 	}
 	else if (observation->GetStartLocation().x == RAX6_STATE.TOP_RIGHT.x && observation->GetStartLocation().y == RAX6_STATE.TOP_RIGHT.y) {

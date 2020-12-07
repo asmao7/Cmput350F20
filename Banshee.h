@@ -148,7 +148,6 @@ void OrionBot::BansheeBuild() {
 		//30 - Barracks > Reactor + Supply Depot
 			//32 - Factory > Tech Lab(2)
 			//Supply Depot
-		std::cout << STAGE3_BANSHEE << std::endl;
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SUPPLYDEPOT) < 5) {
 			OrionBot::TryBuildSupplyDepot();
 		}
@@ -184,7 +183,6 @@ void OrionBot::BansheeBuild() {
 		//39 - Siege Tanks + Supply Depot
 			//52 - Siege Tech > @100 % -Attack
 			//39 Supply Depot
-		std::cout << STAGE4_BANSHEE << std::endl;
 		if (Observation()->GetMinerals() >= 100) {
 			if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SUPPLYDEPOT) < 8) {
 				OrionBot::TryBuildSupplyDepot();
@@ -221,7 +219,6 @@ void OrionBot::BansheeBuild() {
 		break;
 	}
 	case STAGE5_BANSHEE: {
-		std::cout << STAGE5_BANSHEE << std::endl;
 		OrionBot::TryBuildCommandCentre();
 		if (Observation()->GetFoodUsed() > Observation()->GetFoodCap() - 2) {
 			OrionBot::TryBuildSupplyDepot();

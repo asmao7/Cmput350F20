@@ -8,7 +8,7 @@
  * Since Cactus valley and Belshir maps have their expansion 
  * points infront, send the units their to defend while waiting. 
  * For now, no sending defense units for ProximaStationLE map, coz
- * the expansion point is behind.
+ * the expansion point is behind the main base.
 */
 
 void OrionBot::FindMap() {
@@ -16,7 +16,7 @@ void OrionBot::FindMap() {
 	const char* map_name = Observation()->GetGameInfo().map_name.c_str();
 	Maps map;
 
-	std::cout << "map is: Cactus Valley LE (Void)" << std::endl;
+	
 	if (strcmp(map_name, "Cactus Valley LE (Void)") == 0) {
 		map = Maps::CactusValleyLE;
 		FINALSTRATEGY_STATE.toExpand = true;
@@ -59,9 +59,8 @@ void OrionBot::FindMap() {
 		}
 		FINALSTRATEGY_STATE.wait_location = closest_expansion;
 	}
-	else if(strcmp(map_name, "Proxima Station LE (Void)") == 0) {
+	else if(strcmp(map_name, "Proxima Station LE") == 0) {
 		map = Maps::ProximaStationLE;
-		std::cout << "map is: Proxima Station LE (Void)" << std::endl;
 	}
 	else {
 		// should not get to this point
