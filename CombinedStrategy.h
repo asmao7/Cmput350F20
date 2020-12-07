@@ -156,7 +156,7 @@ void OrionBot::CombinedBuild() {
 			TryBuildCommandCentreExpansion(ABILITY_ID::BUILD_COMMANDCENTER, UNIT_TYPEID::TERRAN_SCV);
 		}
 		OrionBot::TryBuildSupplyDepot();
-		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANK) + OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANKSIEGED) > 3) {
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANK) + OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_SIEGETANKSIEGED) > 4) {
 			FINALSTRATEGY_STATE.current_build++;
 		}
 		break;
@@ -164,16 +164,20 @@ void OrionBot::CombinedBuild() {
 	case STAGE5_FINALSTRATEGY: {
 		//std::cout << STAGE5_FINALSTRATEGY << std::endl;
 		//BANSHEE_STATE.morph_techlab = true;
-		final_attack();
-		OrionBot::TryBuildCommandCentre();
+		OrionBot::final_attack();
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_ORBITALCOMMAND) < 1) {
+			OrionBot::TryBuildCommandCentre();
+		}
 		OrionBot::TryBuildSupplyDepot();
 		OrionBot::BuildRefinery();
 		OrionBot::FillRefineries();
 
-		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_COMMANDCENTER) > 0) {
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BARRACKS) < 3) {
 			OrionBot::TryBuildBarracks();
 		}
-		OrionBot::TryBuildFactory();
+		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_FACTORY) < 3) {
+			OrionBot::TryBuildFactory();
+		}
 		if (OrionBot::CountUnitType(UNIT_TYPEID::TERRAN_BANSHEE) < 3) {
 			FINALSTRATEGY_STATE.produce_banshee = true;
 		}
@@ -214,7 +218,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 				break;
 			}
 			Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE, mineral_target);
-			/*if (FINALSTRATEGY_STATE.current_build < STAGE3_FINALSTRATEGY) {
+			/*if (FINALSTRATEGY_STATE.current_build >= STAGE5_FINALSTRATEGY) {
 				Actions()->UnitCommand(unit, ABILITY_ID::EFFECT_CALLDOWNMULE, mineral_target);
 			}
 			else {
@@ -222,7 +226,15 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 			}	*/
 		}
 		else {
-			Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
+			if (FINALSTRATEGY_STATE.current_build >= STAGE5_FINALSTRATEGY) {
+				if (unit->assigned_harvesters < unit->ideal_harvesters) {
+					Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
+				}
+			}
+			else {
+				Actions()->UnitCommand(unit, ABILITY_ID::TRAIN_SCV);
+			}
+			
 		}
 		break;
 	}
