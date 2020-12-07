@@ -52,7 +52,8 @@ size_t OrionBot::CountUnitType(UNIT_TYPEID unit_type) {
     return Observation()->GetUnits(Unit::Alliance::Self, IsUnit(unit_type)).size();
 }
 
-// From Sc2 Cpp Tutorial
+// From cpp-sc2 examples.cc tutorial examples
+// Adapted to make sure units that are scouting are not reassigned jobs to build structures.
 bool OrionBot::TryBuildStructureRandom(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type) {
     const ObservationInterface* observation = Observation();
 
@@ -94,7 +95,8 @@ bool OrionBot::TryBuildStructureRandom(ABILITY_ID ability_type_for_structure, UN
     return true;
 }
 
-
+// From cpp-sc2 examples.cc tutorial examples
+// Adapted to make sure units that are scouting are not reassigned jobs to build structures.
 bool OrionBot::TryBuildStructure(ABILITY_ID ability_type_for_structure, UNIT_TYPEID unit_type) {
     const ObservationInterface* observation = Observation();
     Units bases = observation->GetUnits(Unit::Alliance::Self, IsTownHall());
@@ -182,7 +184,6 @@ bool OrionBot::TryBuildSupplyDepot() {
 }
 
 // From Sc2 Cpp Tutorial
-// Modified Slightly
 bool OrionBot::TryBuildBarracks() {
     const ObservationInterface* observation = Observation();
 
