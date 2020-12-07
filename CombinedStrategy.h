@@ -327,7 +327,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 			}
 		}
 		else {
-			if (FINALSTRATEGY_STATE.toExpand) {
+			if (FINALSTRATEGY_STATE.toExpand || FINALSTRATEGY_STATE.BVMap) {
 				Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, FINALSTRATEGY_STATE.wait_location);
 			}
 			else {
@@ -346,7 +346,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 			}
 		}
 		else {
-			if (FINALSTRATEGY_STATE.toExpand) {
+			if (FINALSTRATEGY_STATE.toExpand || FINALSTRATEGY_STATE.BVMap) {
 				Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, FINALSTRATEGY_STATE.wait_location);
 			}
 			else {
@@ -365,7 +365,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 			}
 		}
 		else {
-			if (FINALSTRATEGY_STATE.toExpand) {
+			if (FINALSTRATEGY_STATE.toExpand || FINALSTRATEGY_STATE.BVMap) {
 				Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, FINALSTRATEGY_STATE.wait_location);
 			}
 			else {
@@ -380,7 +380,7 @@ void OrionBot::CombinedOnUnitIdle(const Unit* unit) {
 		break;
 	}
 	case UNIT_TYPEID::TERRAN_THOR: {
-		if (FINALSTRATEGY_STATE.toExpand) {
+		if (FINALSTRATEGY_STATE.toExpand || FINALSTRATEGY_STATE.BVMap) {
 			Actions()->UnitCommand(unit, ABILITY_ID::ATTACK, FINALSTRATEGY_STATE.wait_location);
 		}
 		else {

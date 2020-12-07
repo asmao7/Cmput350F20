@@ -32,7 +32,28 @@ void OrionBot::FindMap() {
 	}
 	else if (strcmp(map_name, "Bel'Shir Vestige LE (Void)") == 0) {
 		map = Maps::BelShirVestigeLE;
+		FINALSTRATEGY_STATE.BVMap = true;
 		std::cout << "map is: BelShir" << std::endl;
+
+		const ObservationInterface* observation = Observation();
+		Point3D startLocation_ = Observation()->GetStartLocation();
+		Point3D staging_location_ = startLocation_;
+		std::vector<Point3D> expansions_ = search::CalculateExpansionLocations(Observation(), Query());
+		Point2D closest_expansion;
+		float minimum_distance = std::numeric_limits<float>::max();
+		for (const auto& expansion : expansions_) {
+			float current_distance = Distance2D(startLocation_, expansion);
+			if (current_distance < .01f) {
+				continue;
+			}
+			if (current_distance < minimum_distance) {
+				if (Query()->Placement(ABILITY_ID::BUILD_COMMANDCENTER, expansion)) {
+					closest_expansion = expansion;
+					minimum_distance = current_distance;
+				}
+			}
+		}
+		FINALSTRATEGY_STATE.wait_location = closest_expansion;
 	}
 	else if(strcmp(map_name, "Proxima Station LE (Void)") == 0) {
 		map = Maps::ProximaStationLE;
