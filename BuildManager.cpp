@@ -1,8 +1,8 @@
 #include "OrionBot.h"
 
-//Taken from Blizzard Sc2 Example Library
-//Builds a structure at given location.
-//Takes in a point.
+// From cpp-sc2 examples.cc tutorial examples
+// Adapted to make sure units that are scouting are not reassigned jobs to build structures.
+// Used for building refineries.
 bool OrionBot::TryBuildStructureTargeted(ABILITY_ID ability_type_for_structure, Tag location_tag, UNIT_TYPEID unit_type = UNIT_TYPEID::TERRAN_SCV) {
     const ObservationInterface* observation = Observation();
     Units workers = observation->GetUnits(Unit::Alliance::Self, IsUnit(unit_type));
@@ -64,29 +64,33 @@ bool OrionBot::TryBuildFactory() {
 bool OrionBot::TryBuildStarport() {
     return OrionBot::TryBuildStructure(ABILITY_ID::BUILD_STARPORT);
 }
+
 //Try to build engineering bay
 bool OrionBot::TryBuildEngineeringBay() {
     return OrionBot::TryBuildStructure(ABILITY_ID::BUILD_ENGINEERINGBAY);
 }
+
 //Try to build engineering bay
 bool OrionBot::TryBuildMissleTurret() {
     return OrionBot::TryBuildStructure(ABILITY_ID::BUILD_MISSILETURRET);
 }
+
 //Try to build ghost academy
 bool OrionBot::TryBuildGhostAcademy() {
     return OrionBot::TryBuildStructure(ABILITY_ID::BUILD_GHOSTACADEMY);
 }
-//Try to build ghost academy
+
+//Try to build armory
 //Made by: Joe
 bool OrionBot::TryBuildArmory() {
     return OrionBot::TryBuildStructure(ABILITY_ID::BUILD_ARMORY);
 }
 
-
+//Try to upgrade to orbital command
+//Made by: Joe
 void OrionBot::TryBuildOrbitalCommand() {
     const ObservationInterface* observation = Observation();
     Units bases = observation->GetUnits(Unit::Self, IsTownHall());
-    //Units barracks = observation->GetUnits(Unit::Self, IsUnits(barrack_types));
 
     for (const auto& base : bases) {
         if (base->unit_type == UNIT_TYPEID::TERRAN_COMMANDCENTER && observation->GetMinerals() > 150) {
@@ -109,6 +113,9 @@ bool OrionBot::AddWorkersToRefineries(const Unit* unit) {
     }
     return false;
 }
+
+//Add workers to refineries
+//Ensures each refinery has 3/3 workers.
 bool OrionBot::FillRefineries() {
     const ObservationInterface* observation = Observation();
     Units workers = observation->GetUnits(Unit::Alliance::Self, IsUnit(UNIT_TYPEID::TERRAN_SCV));
@@ -249,7 +256,8 @@ bool OrionBot::FindEnemyPosition(Point2D& target_pos) {
     return true;
 }
 
-//ADDED
+// From cpp-sc2 examples.cc tutorial examples
+// Used for building refineries.
 bool OrionBot::BuildRefinery() {
     const ObservationInterface* observation = Observation();
     Units bases = observation->GetUnits(Unit::Alliance::Self, IsTownHall());
@@ -270,6 +278,8 @@ bool OrionBot::BuildRefinery() {
     return false;
 }
 
+// From cpp-sc2 examples.cc tutorial examples
+// Used for building refineries.
 bool OrionBot::TryBuildGas(AbilityID build_ability, UnitTypeID worker_type, Point2D base_location) {
     const ObservationInterface* observation = Observation();
     Units geysers = observation->GetUnits(Unit::Alliance::Neutral, IsGeyser());

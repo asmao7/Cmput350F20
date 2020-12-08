@@ -1,3 +1,4 @@
+#pragma once
 //#include "OrionBot.h"
 // 12 Marines @4:30 Strategy
 // Made by Ana
@@ -26,20 +27,20 @@
 	Attack
 */
 
-void OrionBot::Marines12Build();
+void Marines12Build();
 
-void OrionBot::Marines12OnUnitIdle(const Unit* unit);
+void Marines12OnUnitIdle(const Unit* unit);
 
-void OrionBot::tryCalldownMULE(const Unit* unit);
+void tryCalldownMULE(const Unit* unit);
 
-void OrionBot::tryCalldownExtraSupplies(const Unit* unit);
+void tryCalldownExtraSupplies(const Unit* unit);
 
-void OrionBot::OnUnitEnterVision(const Unit* unit);
+void OnUnitEnterVision(const Unit* unit);
 
-void OrionBot::closestToBase(Point2D coord);
+void closestToBase(Point2D coord);
 
-Point2D OrionBot::FindEnemyBase();
+Point2D FindEnemyBase();
 
-void OrionBot::scout();
+void scout();
 
-void OrionBot::attack();
+void attack();
